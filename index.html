@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover" />
-<!-- PWA Meta Tags -->
 <meta name="theme-color" content="#1e3a8a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -100,11 +99,11 @@ input[type="text"], input[type="number"], select{
 }
 .small-btn{ padding:8px 12px; font-size:13px; border-radius:30px; border:0; cursor:pointer; font-weight:500; }
 .btn-primary{ background:var(--accent); color:#fff; border:0; padding:10px 16px; border-radius:30px; cursor:pointer; font-weight:600; }
-table{ width:100%; border-collapse:collapse; margin-top:12px; display: block; overflow-x: auto; white-space: nowrap; }
-th,td{ padding:10px 8px; border:1px solid #e2e8f0; text-align:left; font-size:13px; }
-th{ background:#f8fafc; font-weight:600; }
+table{ width:100%; border-collapse:collapse; margin-top:12px; }
+th,td{ padding:10px 8px; border:1px solid #e2e8f0; text-align:center; vertical-align:middle; font-size:13px; }
+th{ background:#f8fafc; font-weight:600; text-align:center; }
 .table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 12px; border-radius: 12px; }
-.table-wrapper table { display: table; min-width: 550px; white-space: nowrap; }
+.table-wrapper table { min-width: 400px; }
 .param-container { background: #f8fafc; padding: 12px; border-radius: 20px; margin: 12px 0; }
 .param-group { display: flex; flex-direction: column; gap: 12px; }
 .param-item { flex: 1; min-width: 0; }
@@ -144,6 +143,7 @@ th{ background:#f8fafc; font-weight:600; }
     padding: 6px;
     width: 80px;
     font-weight: bold;
+    text-align: center;
 }
 .input-nilai-jBenar.error {
     border: 2px solid #ef4444 !important;
@@ -198,14 +198,7 @@ th{ background:#f8fafc; font-weight:600; }
     .print-area, .print-area * { visibility: visible; }
     .print-area { position: fixed; inset: 0; padding: 8px; box-sizing: border-box; }
     .print-area table { white-space: normal; }
-}
-@media (max-width: 640px) {
-    .main { padding: 10px; }
-    h1 { font-size: 1.4rem; margin-left: 40px; }
-    .toggleBtn { left: 10px; top: 10px; padding: 8px 12px; }
-    .page { padding: 12px; }
-    th, td { padding: 6px 5px; font-size: 12px; }
-    .button-group-action button { font-size: 12px; padding: 8px 12px; }
+    .print-area th, .print-area td { text-align: center !important; }
 }
 </style>
 </head>
@@ -225,7 +218,6 @@ th{ background:#f8fafc; font-weight:600; }
 <main class="main" id="main">
   <h1>✨ Konversi Nilai Siswa</h1>
   
-  <!-- Dashboard -->
   <section id="dashboard" class="page show">
     <h2>📈 Ringkasan Data</h2>
     <div class="dashboard-stats">
@@ -235,7 +227,6 @@ th{ background:#f8fafc; font-weight:600; }
     </div>
   </section>
 
-  <!-- Identitas -->
   <section id="identitas" class="page">
     <h2>🏷️ Identitas Sekolah</h2>
     <label>📛 Nama Sekolah</label><input type="text" id="namaSekolah" placeholder="SMK Negeri 1">
@@ -247,7 +238,6 @@ th{ background:#f8fafc; font-weight:600; }
     <div style="margin-top:16px"><button class="btn-primary" onclick="simpanIdentitas()">💾 Simpan Identitas</button></div>
   </section>
 
-  <!-- Data Siswa -->
   <section id="datasiswa" class="page">
     <h2>📋 Data Siswa</h2>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px">
@@ -259,13 +249,12 @@ th{ background:#f8fafc; font-weight:600; }
     </div>
     <div class="table-wrapper">
       <table id="tblSiswa">
-        <thead> <tr><th>No</th><th>No Peserta</th><th>Nama</th><th>Kelas</th><th>Aksi</th></tr> </thead>
+        <thead><tr><th>No</th><th>Nama</th><th>Kelas</th><th>Aksi</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
   </section>
 
-  <!-- INPUT NILAI -->
   <section id="inputnilai" class="page">
     <h2>🎯 Input & Konversi Nilai</h2>
     <div class="caption-input">
@@ -302,14 +291,14 @@ th{ background:#f8fafc; font-weight:600; }
       </div>
     </div>
 
-    <div style="margin-top:12px; background:#e6f7ec; padding:8px 12px; border-radius:16px; font-size:13px;">
+    <div style="margin-top:12px; background:#e6f7ec; padding:8px 12px; border-radius:16px; font-size:13px; text-align:center;">
       📊 Rentang Nilai Asli: <strong><span id="autoMinAsli">N/A</span> - <span id="autoMaxAsli">N/A</span></strong>
     </div>
 
     <div class="table-wrapper">
-      <table id="tblInputNilai" style="min-width:600px">
+      <table id="tblInputNilai" style="min-width:500px">
         <thead>
-          <tr><th>No</th><th>No Peserta</th><th>Nama</th><th>✅ J. Benar</th><th>📐 Nilai Asli</th><th>🎯 Nilai Jadi</th></tr>
+          <tr><th>No</th><th>Nama</th><th>✅ J. Benar</th><th>📐 Nilai Asli</th><th>🎯 Nilai Jadi</th></tr>
         </thead>
         <tbody></tbody>
       </table>
@@ -322,7 +311,6 @@ th{ background:#f8fafc; font-weight:600; }
     </div>
   </section>
 
-  <!-- HALAMAN BACKUP & RESTORE -->
   <section id="backup" class="page">
     <h2>💾 Backup & Restore Data</h2>
     <div class="backup-panel">
@@ -332,91 +320,89 @@ th{ background:#f8fafc; font-weight:600; }
         <input type="file" id="restoreFileInput" accept=".json" style="display:none" onchange="restoreDataFromFile(this)">
         <button class="restore-btn" onclick="document.getElementById('restoreFileInput').click()">↩️ Restore dari JSON</button>
       </div>
-      <p style="font-size:12px; margin-top:8px; color:#4b5563">Backup mencakup: data siswa, nilai (jBenar & konversi), identitas sekolah, dan parameter per kelas.</p>
     </div>
   </section>
 
-  <!-- Print area -->
   <div id="printArea" class="print-area">
     <div style="padding:15px">
-      <h2 id="printSekolah"></h2>
-      <div id="printMeta"></div>
+      <h2 id="printSekolah" style="text-align:center"></h2>
+      <div id="printMeta" style="text-align:center"></div>
       <table id="printTable" style="width:100%;border-collapse:collapse;margin-top:10px;">
-        <thead><tr><th>No</th><th>No Peserta</th><th>Nama</th><th>Jumlah Benar</th><th>Nilai Asli</th><th>Nilai Jadi</th><th>Keterangan</th></tr></thead>
+        <thead><tr><th>No</th><th>Nama</th><th>Jumlah Benar</th><th>Nilai Asli</th><th>Nilai Jadi</th><th>Keterangan</th></tr></thead>
         <tbody></tbody>
       </table>
-      <div class="ttd">
-        <div>Mengetahui,<br><br><strong>Kepala Sekolah</strong><br><br><br><br><u id="printNamaKepalaSekolah"></u><br>NIP.</div>
-        <div><strong>Guru Mata Pelajaran</strong><br><br><br><br><u id="printNamaGuru"></u><br>NIP.</div>
+      <div class="ttd" style="display:flex; justify-content:space-between; margin-top:30px;">
+        <div style="text-align:center">Mengetahui,<br><br><strong>Kepala Sekolah</strong><br><br><br><br><u id="printNamaKepalaSekolah"></u><br>NIP.</div>
+        <div style="text-align:center"><strong>Guru Mata Pelajaran</strong><br><br><br><br><u id="printNamaGuru"></u><br>NIP.</div>
       </div>
     </div>
   </div>
 </main>
 
 <script>
-// ======================= DATA SISWA =======================
+// ======================= DATA SISWA (Tanpa No Peserta, Tanpa Raditia Danu Pratama) =======================
 let siswa = [
-    { noPeserta: '10-1001-0001-8', nama: 'Adi Saputra', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0002-7', nama: 'Aulia Nur Laela', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0003-6', nama: 'Cipa Nadia Salma', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0004-5', nama: 'Dedi Irawan', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0005-4', nama: 'Farel Saputra', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0006-3', nama: 'Irfan', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0007-2', nama: 'Ismawati Dwi Anggraini', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0008-1', nama: 'Luthfi Hakim', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0010-9', nama: 'M.Riki Saputra', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0011-8', nama: 'M.Haris Setiawan', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0012-7', nama: 'M.Al Imron', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0013-6', nama: 'Nayla Himmatul Ulya', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0014-5', nama: 'Raditia Danu Pratama', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0015-4', nama: 'Ridho Firmansyah', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0016-3', nama: 'Rizal Abdul Haq', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0017-2', nama: 'Rizki Cahyo Sugeng Wibowo', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0018-1', nama: 'Safa Aulia Putri', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0019-9', nama: 'Shinta Sastya Wati', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '10-1001-0020-8', nama: 'Tiyas Farida Sari', kelas: 'X', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0001-8', nama: 'Ahmad Iqbal', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0002-7', nama: 'Ahmad Ramadhani', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0003-6', nama: 'Argi Setiyawan', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0004-5', nama: 'Aisyah Lu\'lu\'ul Husna', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0005-4', nama: 'Anggun Puspita Anggraini', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0006-3', nama: 'Dafa', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0007-2', nama: 'Devita Anjani', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0008-9', nama: 'Ferdi Kurniawan', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0009-8', nama: 'Fitra Afriza', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0010-7', nama: 'Indah Kasturi Kusuma Putri', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0011-6', nama: 'Lefiyana Juwita', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0012-5', nama: 'Marchfel Firdyansah', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0013-4', nama: 'Melinda Kusuma Dewi', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0014-3', nama: 'Muhamad yudha Rizky Iftori', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0015-2', nama: 'Mohamad Ibnu Rosid', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0016-9', nama: 'Muhammad Bisma Mega Nanda', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0017-8', nama: 'Muhammad Rizki Ramadhani', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0018-7', nama: 'Muhammad Fiki Darmawan', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0019-6', nama: 'M.Badru Muwafaq', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0020-5', nama: 'Rima', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0021-4', nama: 'Rima Ulvania', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0022-3', nama: 'Riski Munandar', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0023-2', nama: 'Siti Miftakhul Makmuroh', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0024-9', nama: 'Tomi Jatmiko', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0025-8', nama: 'Tia Dwi Saputri', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0026-7', nama: 'Wafiq Khariri', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0027-6', nama: 'Yeni Winarni', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0028-5', nama: 'Ainun Nadhiroh', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0029-4', nama: 'Dwi Fatimah', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0030-3', nama: 'M.Akbar Panjalu', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0031-2', nama: 'Habibatus zakia', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0032-9', nama: 'Angga Dwi Saputra', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0033-8', nama: 'M. Aufa Azmi', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0034-7', nama: 'Bayu', kelas: 'XI', jBenar: undefined, konversi: undefined },
-    { noPeserta: '11-1001-0035-6', nama: 'Ananda Ajeng P', kelas: 'XI', jBenar: undefined, konversi: undefined }
+    { nama: 'Adi Saputra', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'Aulia Nur Laela', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'Cipa Nadia Salma', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'Dedi Irawan', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'Farel Saputra', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'Irfan', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'Ismawati Dwi Anggraini', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'Luthfi Hakim', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'M.Riki Saputra', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'M.Haris Setiawan', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'M.Al Imron', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'Nayla Himmatul Ulya', kelas: 'X', jBenar: undefined, konversi: undefined },
+    // Raditia Danu Pratama dihapus
+    { nama: 'Ridho Firmansyah', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'Rizal Abdul Haq', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'Rizki Cahyo Sugeng Wibowo', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'Safa Aulia Putri', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'Shinta Sastya Wati', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'Tiyas Farida Sari', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { nama: 'Ahmad Iqbal', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Ahmad Ramadhani', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Argi Setiyawan', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Aisyah Lu\'lu\'ul Husna', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Anggun Puspita Anggraini', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Dafa', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Devita Anjani', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Ferdi Kurniawan', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Fitra Afriza', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Indah Kasturi Kusuma Putri', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Lefiyana Juwita', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Marchfel Firdyansah', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Melinda Kusuma Dewi', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Muhamad yudha Rizky Iftori', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Mohamad Ibnu Rosid', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Muhammad Bisma Mega Nanda', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Muhammad Rizki Ramadhani', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Muhammad Fiki Darmawan', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'M.Badru Muwafaq', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Rima', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Rima Ulvania', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Riski Munandar', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Siti Miftakhul Makmuroh', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Tomi Jatmiko', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Tia Dwi Saputri', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Wafiq Khariri', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Yeni Winarni', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Ainun Nadhiroh', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Dwi Fatimah', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'M.Akbar Panjalu', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Habibatus zakia', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Angga Dwi Saputra', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'M. Aufa Azmi', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Bayu', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { nama: 'Ananda Ajeng P', kelas: 'XI', jBenar: undefined, konversi: undefined }
 ];
 
 let identitas = {namaSekolah:'', namaKepalaSekolah:'', namaGuru:'', namaMapel:'', semester:'', tahun:''};
 
 // ======================= LOCALSTORAGE =======================
 function simpanSemuaNilaiKeLocal() {
-    const dataToStore = siswa.map(s => ({ noPeserta: s.noPeserta, kelas: s.kelas, jBenar: s.jBenar, konversi: s.konversi }));
+    const dataToStore = siswa.map(s => ({ nama: s.nama, kelas: s.kelas, jBenar: s.jBenar, konversi: s.konversi }));
     localStorage.setItem('siswaNilai', JSON.stringify(dataToStore));
 }
 function loadNilaiDariLocal() {
@@ -424,7 +410,7 @@ function loadNilaiDariLocal() {
     if (stored) {
         const nilaiArr = JSON.parse(stored);
         nilaiArr.forEach(n => {
-            const idx = siswa.findIndex(s => s.noPeserta === n.noPeserta && s.kelas === n.kelas);
+            const idx = siswa.findIndex(s => s.nama === n.nama && s.kelas === n.kelas);
             if (idx !== -1) { siswa[idx].jBenar = n.jBenar; siswa[idx].konversi = n.konversi; }
         });
     }
@@ -445,48 +431,29 @@ function loadParameterDariLocal(kelas) {
 
 // ======================= BACKUP & RESTORE =======================
 function backupData() {
-    const dataToBackup = {
-        siswa: siswa.map(s => ({ noPeserta: s.noPeserta, nama: s.nama, kelas: s.kelas, jBenar: s.jBenar, konversi: s.konversi })),
-        identitas: identitas,
-        params: {
-            param_X: localStorage.getItem('param_X') || null,
-            param_XI: localStorage.getItem('param_XI') || null
-        }
-    };
+    const dataToBackup = { siswa: siswa, identitas: identitas, params: { param_X: localStorage.getItem('param_X'), param_XI: localStorage.getItem('param_XI') } };
     const blob = new Blob([JSON.stringify(dataToBackup, null, 2)], {type: 'application/json'});
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `backup_nilai_${new Date().toISOString().slice(0,19)}.json`;
-    a.click();
-    URL.revokeObjectURL(url);
-    alert('Backup berhasil dibuat!');
+    const a = document.createElement('a'); a.href = url; a.download = `backup_nilai_${new Date().toISOString().slice(0,19)}.json`; a.click();
+    URL.revokeObjectURL(url); alert('Backup berhasil dibuat!');
 }
 function restoreDataFromFile(input) {
-    const file = input.files[0];
-    if (!file) return;
+    const file = input.files[0]; if (!file) return;
     const reader = new FileReader();
     reader.onload = function(e) {
         try {
             const restored = JSON.parse(e.target.result);
             if (restored.siswa && Array.isArray(restored.siswa)) {
-                siswa = restored.siswa.map(s => ({ ...s, jBenar: s.jBenar, konversi: s.konversi }));
-                simpanSemuaNilaiKeLocal();
-                renderTable();
+                siswa = restored.siswa; simpanSemuaNilaiKeLocal(); renderTable();
                 if (restored.identitas) { identitas = restored.identitas; localStorage.setItem('identitas', JSON.stringify(identitas)); loadIdentitas(); }
-                if (restored.params) {
-                    if (restored.params.param_X) localStorage.setItem('param_X', restored.params.param_X);
-                    if (restored.params.param_XI) localStorage.setItem('param_XI', restored.params.param_XI);
-                }
-                alert('Restore berhasil! Silakan refresh halaman atau pilih kelas untuk melihat perubahan.');
-                location.reload();
+                if (restored.params) { if (restored.params.param_X) localStorage.setItem('param_X', restored.params.param_X); if (restored.params.param_XI) localStorage.setItem('param_XI', restored.params.param_XI); }
+                alert('Restore berhasil!'); location.reload();
             } else throw new Error('Format tidak sesuai');
         } catch(err) { alert('File JSON tidak valid: '+err.message); }
-    };
-    reader.readAsText(file);
+    }; reader.readAsText(file);
 }
 
-// ======================= SIDEBAR =======================
+// ======================= SIDEBAR & UI =======================
 const sidebar = document.getElementById('sidebar'), overlay = document.getElementById('overlay'), toggleBtn = document.getElementById('toggleBtn');
 function openSidebar(){sidebar.classList.add('open');overlay.classList.add('show');}
 function closeSidebar(){sidebar.classList.remove('open');overlay.classList.remove('show');}
@@ -520,21 +487,20 @@ function loadIdentitas() {
 function renderTable(){ 
     const body=document.querySelector('#tblSiswa tbody'); body.innerHTML=''; 
     siswa.forEach((s,i)=>{ const tr=document.createElement('tr'); 
-        tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(s.noPeserta)}</td><td>${escapeHtml(s.nama)}</td><td>${escapeHtml(s.kelas)}</td><td><button onclick="hapusSiswa(${i})" style="padding:4px 8px;background:#fee2e2;border-radius:20px;">Hapus</button></td>`; 
+        tr.innerHTML = `<td style="text-align:center">${i+1}</td><td>${escapeHtml(s.nama)}</td><td style="text-align:center">${escapeHtml(s.kelas)}</td><td style="text-align:center"><button onclick="hapusSiswa(${i})" style="padding:4px 8px;background:#fee2e2;border-radius:20px;">Hapus</button></td>`; 
         body.appendChild(tr); }); updateCounts(); 
 }
 function tambahSiswaPrompt(){ 
-    const noPeserta=prompt('No Peserta:'); if(!noPeserta) return;
-    const nama=prompt('Nama:'); if(!nama) return; 
+    const nama=prompt('Nama Siswa:'); if(!nama) return; 
     let kelas=prompt('Kelas (X/XI):'); if(!kelas) return; kelas=kelas.toUpperCase().trim(); 
     if(!['X','XI'].includes(kelas)){ alert('Hanya X/XI'); return; } 
-    siswa.push({noPeserta:noPeserta.trim(), nama:nama.trim(), kelas, jBenar: undefined, konversi: undefined}); 
+    siswa.push({nama:nama.trim(), kelas, jBenar: undefined, konversi: undefined}); 
     simpanSemuaNilaiKeLocal(); renderTable(); 
 }
 function hapusSiswa(i){ if(!confirm('Hapus siswa?')) return; siswa.splice(i,1); simpanSemuaNilaiKeLocal(); renderTable(); }
 function kosongkanData(){ if(!confirm('Kosongkan semua siswa?')) return; siswa=[]; simpanSemuaNilaiKeLocal(); renderTable(); }
 function unduhTemplateXLSX(){ 
-    const ws_data=[['No Peserta','Nama Siswa','Kelas']]; siswa.forEach(s => ws_data.push([s.noPeserta, s.nama, s.kelas]));
+    const ws_data=[['Nama Siswa','Kelas']]; siswa.forEach(s => ws_data.push([s.nama, s.kelas]));
     const ws=XLSX.utils.aoa_to_sheet(ws_data); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Data Siswa'); XLSX.writeFile(wb,`template_siswa.xlsx`); 
 }
 function unggahTemplateXLSX(evt){ 
@@ -543,42 +509,29 @@ function unggahTemplateXLSX(evt){
         const workbook=XLSX.read(new Uint8Array(e.target.result),{type:'array'}); 
         const sheet=workbook.Sheets[workbook.SheetNames[0]]; 
         const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:''}); let added=0, updated=0; 
-        for(let r=1;r<rows.length;r++){ const row=rows[r]; if(!row||row.length<2) continue; 
-            const noPeserta=(row[0]||'').toString().trim(); const nama=(row[1]||'').toString().trim(); 
-            let kelas=((row[2]||'')+'').toString().trim().toUpperCase(); if(!noPeserta||!nama||!['X','XI'].includes(kelas)) continue;
-            const idx = siswa.findIndex(s => s.noPeserta === noPeserta);
-            if (idx > -1) { siswa[idx].nama = nama; siswa[idx].kelas = kelas; updated++; } 
-            else { siswa.push({noPeserta, nama, kelas, jBenar: undefined, konversi: undefined}); added++; }
+        for(let r=1;r<rows.length;r++){ const row=rows[r]; if(!row||row.length<1) continue; 
+            const nama=(row[0]||'').toString().trim(); let kelas=((row[1]||'')+'').toString().trim().toUpperCase(); 
+            if(!nama||!['X','XI'].includes(kelas)) continue;
+            const idx = siswa.findIndex(s => s.nama === nama);
+            if (idx > -1) { siswa[idx].kelas = kelas; updated++; } 
+            else { siswa.push({nama, kelas, jBenar: undefined, konversi: undefined}); added++; }
         } simpanSemuaNilaiKeLocal(); renderTable(); alert(`Upload selesai. +${added} baru, ${updated} update`);
     }; reader.readAsArrayBuffer(file); 
 }
 
-// Validasi & update nilai dengan aturan: jika kosong -> 0, jika > jumlah soal -> peringatan
 function validasiDanUpdateJBenar(inputElem) {
     const jumSoal = Number(document.getElementById('jumSoal').value);
     let nilai = inputElem.value === '' ? undefined : Number(inputElem.value);
-    if (nilai !== undefined && !isNaN(nilai)) {
-        if (nilai > jumSoal && jumSoal > 0) {
-            alert(`⚠️ Jawaban benar tidak boleh melebihi jumlah soal (${jumSoal})! Nilai akan diset 0.`);
-            nilai = undefined;
-            inputElem.value = '';
-            inputElem.classList.add('error');
-            setTimeout(() => inputElem.classList.remove('error'), 1500);
-        } else {
-            inputElem.classList.remove('error');
-        }
-    } else {
-        inputElem.classList.remove('error');
-    }
-    const noPeserta = inputElem.getAttribute('data-no');
+    if (nilai !== undefined && !isNaN(nilai) && nilai > jumSoal && jumSoal > 0) {
+        alert(`⚠️ Jawaban benar tidak boleh melebihi jumlah soal (${jumSoal})! Nilai akan diset 0.`);
+        nilai = undefined; inputElem.value = ''; inputElem.classList.add('error');
+        setTimeout(() => inputElem.classList.remove('error'), 1500);
+    } else { inputElem.classList.remove('error'); }
+    const nama = inputElem.getAttribute('data-nama');
     const kelas = document.getElementById('pilihKelas').value;
-    const idx = siswa.findIndex(s => s.noPeserta === noPeserta && s.kelas === kelas);
-    if (idx !== -1) {
-        siswa[idx].jBenar = (nilai !== undefined && !isNaN(nilai)) ? nilai : undefined;
-        simpanSemuaNilaiKeLocal();
-    }
+    const idx = siswa.findIndex(s => s.nama === nama && s.kelas === kelas);
+    if (idx !== -1) { siswa[idx].jBenar = (nilai !== undefined && !isNaN(nilai)) ? nilai : undefined; simpanSemuaNilaiKeLocal(); }
     hitungDanUpdateTampilanNilai();
-    return true;
 }
 function hitungDanUpdateTampilanNilai() {
     const kelas = document.getElementById('pilihKelas').value;
@@ -594,8 +547,6 @@ function hitungDanUpdateTampilanNilai() {
         if (jBenar !== undefined && !isNaN(jBenar) && jumSoal > 0 && jBenar <= jumSoal) {
             nilaiAsli = (jBenar / jumSoal) * 100;
             nilaiAsliList.push(nilaiAsli);
-        } else {
-            nilaiAsli = 0;
         }
         nilaiAsliCell.textContent = (jBenar !== undefined && !isNaN(jBenar) && jumSoal > 0 && jBenar <= jumSoal) ? nilaiAsli.toFixed(2) : '0';
         const minKonv = Number(document.getElementById('minKonv').value);
@@ -607,15 +558,10 @@ function hitungDanUpdateTampilanNilai() {
             else if (nilaiAsli >= maxAsliGlobal) nilaiJadi = maxKonv;
             else nilaiJadi = Math.round(((nilaiAsli - minAsliGlobal)/(maxAsliGlobal - minAsliGlobal)) * (maxKonv - minKonv) + minKonv);
             nilaiKonversiCell.textContent = nilaiJadi;
-            const noPeserta = jBenarInput.getAttribute('data-no');
-            const idx = siswa.findIndex(s => s.noPeserta === noPeserta && s.kelas === kelas);
+            const nama = jBenarInput.getAttribute('data-nama');
+            const idx = siswa.findIndex(s => s.nama === nama && s.kelas === kelas);
             if (idx !== -1) siswa[idx].konversi = nilaiJadi;
-        } else {
-            nilaiKonversiCell.textContent = '0';
-            const noPeserta = jBenarInput.getAttribute('data-no');
-            const idx = siswa.findIndex(s => s.noPeserta === noPeserta && s.kelas === kelas);
-            if (idx !== -1 && (jBenar === undefined || isNaN(jBenar) || jumSoal <= 0 || jBenar > jumSoal)) siswa[idx].konversi = 0;
-        }
+        } else { nilaiKonversiCell.textContent = '0'; }
     });
     if (nilaiAsliList.length > 0 && jumSoal > 0) {
         document.getElementById('autoMinAsli').textContent = Math.min(...nilaiAsliList).toFixed(2);
@@ -630,9 +576,11 @@ function renderInputNilai(){
     const list=siswa.filter(s=>s.kelas===kelas);
     list.forEach((s,i)=>{ 
         const tr=document.createElement('tr'); 
-        tr.innerHTML=`<td>${i+1}</td><td>${escapeHtml(s.noPeserta)}</td><td>${escapeHtml(s.nama)}</td>
-                      <td><input type="number" class="input-nilai-jBenar" data-no="${escapeHtml(s.noPeserta)}" value="${s.jBenar!==undefined && s.jBenar!==null ? escapeHtml(s.jBenar) : ''}" style="width:80px" oninput="validasiDanUpdateJBenar(this)"></td>
-                      <td class="nilaiAsli">0</td><td class="nilaiKonversi">0</td>`; 
+        tr.innerHTML=`<td style="text-align:center">${i+1}</td>
+                      <td style="text-align:center">${escapeHtml(s.nama)}</td>
+                      <td style="text-align:center"><input type="number" class="input-nilai-jBenar" data-nama="${escapeHtml(s.nama)}" value="${s.jBenar!==undefined && s.jBenar!==null ? escapeHtml(s.jBenar) : ''}" style="width:80px" oninput="validasiDanUpdateJBenar(this)"></td>
+                      <td class="nilaiAsli" style="text-align:center">0</td>
+                      <td class="nilaiKonversi" style="text-align:center">0</td>`; 
         tbody.appendChild(tr); 
     });
     hitungDanUpdateTampilanNilai();
@@ -646,8 +594,7 @@ function prosesKonversi(){
     const kelas=document.getElementById('pilihKelas').value; if(!kelas){ alert('Pilih kelas'); return; }
     hitungDanUpdateTampilanNilai();
     simpanParameterKeLocal();
-    renderTable(); 
-    alert('Konversi selesai & tersimpan!');
+    renderTable(); alert('Konversi selesai & tersimpan!');
 }
 function gantiKelas() { const kelas = document.getElementById('pilihKelas').value; loadParameterDariLocal(kelas); renderInputNilai(); }
 function cetakLembar(){ 
@@ -665,7 +612,7 @@ function cetakLembar(){
         let jBenarValid = (s.jBenar !== undefined && !isNaN(s.jBenar) && s.jBenar <= jumSoal && jumSoal>0) ? s.jBenar : 0;
         let nilaiAsli = (jBenarValid > 0 && jumSoal>0) ? ((jBenarValid / jumSoal) * 100).toFixed(2) : '0';
         let nilaiJadi = (s.konversi !== undefined && s.konversi !== null && !isNaN(s.konversi)) ? s.konversi : '0';
-        tbody.innerHTML += `<tr><td>${i+1}</td><td>${escapeHtml(s.noPeserta)}</td><td>${escapeHtml(s.nama)}</td><td>${jBenarValid}</td><td>${nilaiAsli}</td><td>${nilaiJadi}</td><td></td></tr>`;
+        tbody.innerHTML += `<tr><td style="text-align:center">${i+1}</td><td style="text-align:center">${escapeHtml(s.nama)}</td><td style="text-align:center">${jBenarValid}</td><td style="text-align:center">${nilaiAsli}</td><td style="text-align:center">${nilaiJadi}</td><td style="text-align:center"></td></tr>`;
     });
     printArea.style.display='block'; window.print(); printArea.style.display='none'; 
 }
@@ -680,20 +627,20 @@ function simpanPDF() {
         let jBenarValid = (s.jBenar !== undefined && !isNaN(s.jBenar) && s.jBenar <= jumSoal && jumSoal>0) ? s.jBenar : 0;
         let nilaiAsli = (jBenarValid > 0 && jumSoal>0) ? ((jBenarValid / jumSoal)*100).toFixed(2) : '0';
         let nilaiJadi = (s.konversi !== undefined && s.konversi !== null && !isNaN(s.konversi)) ? s.konversi : '0';
-        return [i+1, s.noPeserta, s.nama, jBenarValid, nilaiAsli, nilaiJadi];
+        return [i+1, s.nama, jBenarValid, nilaiAsli, nilaiJadi];
     });
-    doc.autoTable({ head: [['No','No Peserta','Nama','Jml Benar','Nilai Asli','Nilai Jadi']], body: bodyData, startY: 35, styles: { fontSize: 9 } });
+    doc.autoTable({ head: [['No', 'Nama', 'Jml Benar', 'Nilai Asli', 'Nilai Jadi']], body: bodyData, startY: 35, styles: { fontSize: 9, halign: 'center' }, headStyles: { halign: 'center' } });
     doc.save(`Nilai_${kelas}.pdf`);
 }
 function unduhExcelNilai() {
     const kelas = document.getElementById('pilihKelas').value; if(!kelas) return alert('Pilih kelas');
     const jumSoal = Number(document.getElementById('jumSoal').value); if(isNaN(jumSoal)||jumSoal<=0) return alert('Jumlah soal tidak valid');
-    const data = [['No','No Peserta','Nama','Jumlah Benar','Nilai Asli','Nilai Jadi']];
+    const data = [['No', 'Nama', 'Jumlah Benar', 'Nilai Asli', 'Nilai Jadi']];
     siswa.filter(s=>s.kelas===kelas).forEach((s,i)=>{
         let jBenarValid = (s.jBenar !== undefined && !isNaN(s.jBenar) && s.jBenar <= jumSoal && jumSoal>0) ? s.jBenar : 0;
         let nilaiAsli = (jBenarValid > 0 && jumSoal>0) ? ((jBenarValid / jumSoal)*100).toFixed(2) : '0';
         let nilaiJadi = (s.konversi !== undefined && s.konversi !== null && !isNaN(s.konversi)) ? s.konversi : '0';
-        data.push([i+1, s.noPeserta, s.nama, jBenarValid, nilaiAsli, nilaiJadi]);
+        data.push([i+1, s.nama, jBenarValid, nilaiAsli, nilaiJadi]);
     });
     const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Nilai'); XLSX.writeFile(wb, `Nilai_${kelas}.xlsx`);
 }
