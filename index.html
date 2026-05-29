@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-title" content="Konversi Nilai">
 <link rel="apple-touch-icon" href="icons/icon-192x192.png">
 <link rel="manifest" href="manifest.json">
-<title>Aplikasi Konversi Nilai — Sekolah</title>
+<title>Aplikasi Konversi Nilai — MA. ASH SHIDIQI</title>
 <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
@@ -229,9 +229,8 @@ th{ background:#f8fafc; font-weight:600; text-align:center; }
 
   <section id="identitas" class="page">
     <h2>🏷️ Identitas Sekolah</h2>
-    <label>📛 Nama Sekolah</label><input type="text" id="namaSekolah" placeholder="SMK Negeri 1">
-    <label>👨‍🏫 Kepala Sekolah</label><input type="text" id="namaKepalaSekolah" placeholder="Drs. Ahmad Wijaya">
-    <label>👩‍🏫 Guru Mata Pelajaran</label><input type="text" id="namaGuru" placeholder="Bapak/Ibu Guru">
+    <label>📛 Nama Sekolah</label><input type="text" id="namaSekolah" placeholder="MA. ASH SHIDIQI RAJABASA BARU" value="MA. ASH SHIDIQI RAJABASA BARU">
+    <label>👩‍🏫 Guru Mata Pelajaran</label><input type="text" id="namaGuru" placeholder="Nama Guru">
     <label>📚 Mata Pelajaran</label><input type="text" id="namaMapel" placeholder="Matematika">
     <label>📅 Semester</label><select id="semester"><option>Ganjil</option><option>Genap</option></select>
     <label>🗓️ Tahun Pelajaran</label><input type="text" id="tahunPelajaran" placeholder="2024/2025">
@@ -332,8 +331,12 @@ th{ background:#f8fafc; font-weight:600; text-align:center; }
         <tbody></tbody>
       </table>
       <div class="ttd" style="display:flex; justify-content:space-between; margin-top:30px;">
-        <div style="text-align:center">Mengetahui,<br><br><strong>Kepala Sekolah</strong><br><br><br><br><u id="printNamaKepalaSekolah"></u><br>NIP.</div>
-        <div style="text-align:center"><strong>Guru Mata Pelajaran</strong><br><br><br><br><u id="printNamaGuru"></u><br>NIP.</div>
+        <div style="text-align:center; width:100%;">
+          <div id="printTanggal" style="margin-bottom:20px; font-size:11px;"></div>
+          <strong>Guru Mata Pelajaran</strong><br><br><br><br>
+          <u id="printNamaGuru"></u><br>
+          NIP.
+        </div>
       </div>
     </div>
   </div>
@@ -354,7 +357,6 @@ let siswa = [
     { nama: 'M.Haris Setiawan', kelas: 'X', jBenar: undefined, konversi: undefined },
     { nama: 'M.Al Imron', kelas: 'X', jBenar: undefined, konversi: undefined },
     { nama: 'Nayla Himmatul Ulya', kelas: 'X', jBenar: undefined, konversi: undefined },
-    // Raditia Danu Pratama dihapus
     { nama: 'Ridho Firmansyah', kelas: 'X', jBenar: undefined, konversi: undefined },
     { nama: 'Rizal Abdul Haq', kelas: 'X', jBenar: undefined, konversi: undefined },
     { nama: 'Rizki Cahyo Sugeng Wibowo', kelas: 'X', jBenar: undefined, konversi: undefined },
@@ -398,7 +400,7 @@ let siswa = [
     { nama: 'Ananda Ajeng P', kelas: 'XI', jBenar: undefined, konversi: undefined }
 ];
 
-let identitas = {namaSekolah:'', namaKepalaSekolah:'', namaGuru:'', namaMapel:'', semester:'', tahun:''};
+let identitas = {namaSekolah:'MA. ASH SHIDIQI RAJABASA BARU', namaGuru:'', namaMapel:'', semester:'', tahun:''};
 
 // ======================= LOCALSTORAGE =======================
 function simpanSemuaNilaiKeLocal() {
@@ -464,8 +466,7 @@ document.querySelectorAll('.sidebar ul li').forEach(li=>{ li.addEventListener('c
 function updateCounts(){ document.getElementById('countX').textContent = siswa.filter(s=>s.kelas==='X').length; document.getElementById('countXI').textContent = siswa.filter(s=>s.kelas==='XI').length; document.getElementById('countXII').textContent = siswa.filter(s=>s.kelas==='XII').length; }
 function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function simpanIdentitas(){ 
-    identitas.namaSekolah = document.getElementById('namaSekolah').value; 
-    identitas.namaKepalaSekolah = document.getElementById('namaKepalaSekolah').value;
+    identitas.namaSekolah = document.getElementById('namaSekolah').value || 'MA. ASH SHIDIQI RAJABASA BARU'; 
     identitas.namaGuru = document.getElementById('namaGuru').value; 
     identitas.namaMapel = document.getElementById('namaMapel').value; 
     identitas.semester = document.getElementById('semester').value; 
@@ -475,19 +476,17 @@ function simpanIdentitas(){
 }
 function loadIdentitas() {
     const stored = localStorage.getItem('identitas');
-    if (stored) { identitas = JSON.parse(stored);
-        document.getElementById('namaSekolah').value = identitas.namaSekolah || '';
-        document.getElementById('namaKepalaSekolah').value = identitas.namaKepalaSekolah || '';
-        document.getElementById('namaGuru').value = identitas.namaGuru || '';
-        document.getElementById('namaMapel').value = identitas.namaMapel || '';
-        document.getElementById('semester').value = identitas.semester || 'Ganjil';
-        document.getElementById('tahunPelajaran').value = identitas.tahun || '';
-    }
+    if (stored) { identitas = JSON.parse(stored); }
+    document.getElementById('namaSekolah').value = identitas.namaSekolah || 'MA. ASH SHIDIQI RAJABASA BARU';
+    document.getElementById('namaGuru').value = identitas.namaGuru || '';
+    document.getElementById('namaMapel').value = identitas.namaMapel || '';
+    document.getElementById('semester').value = identitas.semester || 'Ganjil';
+    document.getElementById('tahunPelajaran').value = identitas.tahun || '';
 }
 function renderTable(){ 
     const body=document.querySelector('#tblSiswa tbody'); body.innerHTML=''; 
     siswa.forEach((s,i)=>{ const tr=document.createElement('tr'); 
-        tr.innerHTML = `<td style="text-align:center">${i+1}</td><td>${escapeHtml(s.nama)}</td><td style="text-align:center">${escapeHtml(s.kelas)}</td><td style="text-align:center"><button onclick="hapusSiswa(${i})" style="padding:4px 8px;background:#fee2e2;border-radius:20px;">Hapus</button></td>`; 
+        tr.innerHTML = `<td style="text-align:center">${i+1}</td><td style="text-align:center">${escapeHtml(s.nama)}</td><td style="text-align:center">${escapeHtml(s.kelas)}</td><td style="text-align:center"><button onclick="hapusSiswa(${i})" style="padding:4px 8px;background:#fee2e2;border-radius:20px;">Hapus</button></td>`; 
         body.appendChild(tr); }); updateCounts(); 
 }
 function tambahSiswaPrompt(){ 
@@ -576,11 +575,7 @@ function renderInputNilai(){
     const list=siswa.filter(s=>s.kelas===kelas);
     list.forEach((s,i)=>{ 
         const tr=document.createElement('tr'); 
-        tr.innerHTML=`<td style="text-align:center">${i+1}</td>
-                      <td style="text-align:center">${escapeHtml(s.nama)}</td>
-                      <td style="text-align:center"><input type="number" class="input-nilai-jBenar" data-nama="${escapeHtml(s.nama)}" value="${s.jBenar!==undefined && s.jBenar!==null ? escapeHtml(s.jBenar) : ''}" style="width:80px" oninput="validasiDanUpdateJBenar(this)"></td>
-                      <td class="nilaiAsli" style="text-align:center">0</td>
-                      <td class="nilaiKonversi" style="text-align:center">0</td>`; 
+        tr.innerHTML=`<td style="text-align:center">${i+1}</td><td style="text-align:center">${escapeHtml(s.nama)}</td><td style="text-align:center"><input type="number" class="input-nilai-jBenar" data-nama="${escapeHtml(s.nama)}" value="${s.jBenar!==undefined && s.jBenar!==null ? escapeHtml(s.jBenar) : ''}" style="width:80px" oninput="validasiDanUpdateJBenar(this)"></td><td class="nilaiAsli" style="text-align:center">0</td><td class="nilaiKonversi" style="text-align:center">0</td>`; 
         tbody.appendChild(tr); 
     });
     hitungDanUpdateTampilanNilai();
@@ -602,10 +597,12 @@ function cetakLembar(){
     const jumSoal = Number(document.getElementById('jumSoal').value);
     if(isNaN(jumSoal) || jumSoal <= 0) { alert('Jumlah soal invalid'); return; }
     const printArea=document.getElementById('printArea'); 
-    document.getElementById('printSekolah').textContent = document.getElementById('namaSekolah').value || 'Sekolah'; 
-    document.getElementById('printMeta').textContent = `${document.getElementById('namaMapel').value || ''} | ${document.getElementById('semester').value || ''} | ${document.getElementById('tahunPelajaran').value || ''} | Kelas: ${kelas}`;
-    document.getElementById('printNamaKepalaSekolah').textContent = identitas.namaKepalaSekolah || '-';
-    document.getElementById('printNamaGuru').textContent = identitas.namaGuru || '-';
+    document.getElementById('printSekolah').textContent = identitas.namaSekolah || 'MA. ASH SHIDIQI RAJABASA BARU'; 
+    document.getElementById('printMeta').textContent = `${identitas.namaMapel || ''} | Semester: ${identitas.semester || ''} | Tahun: ${identitas.tahun || ''} | Kelas: ${kelas}`;
+    document.getElementById('printNamaGuru').textContent = identitas.namaGuru || '(Nama Guru Mata Pelajaran)';
+    const today = new Date();
+    const tanggalStr = today.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('printTanggal').innerHTML = `Cetak: ${tanggalStr}`;
     const tbody=document.querySelector('#printTable tbody'); tbody.innerHTML=''; 
     const list=siswa.filter(s=>s.kelas===kelas); 
     list.forEach((s,i)=>{ 
@@ -620,9 +617,9 @@ function simpanPDF() {
     const { jsPDF } = window.jspdf; const kelas = document.getElementById('pilihKelas').value; if(!kelas) return alert('Pilih kelas'); 
     const jumSoal = Number(document.getElementById('jumSoal').value); if(isNaN(jumSoal)||jumSoal<=0) return alert('Jumlah soal tidak valid');
     const doc = new jsPDF(); 
-    doc.text(document.getElementById('namaSekolah').value || 'Sekolah', 105, 20, { align: 'center' });
+    doc.text(identitas.namaSekolah || 'MA. ASH SHIDIQI RAJABASA BARU', 105, 20, { align: 'center' });
     doc.setFontSize(10);
-    doc.text(`${document.getElementById('namaMapel').value || ''} | Kelas: ${kelas}`, 105, 28, { align: 'center' });
+    doc.text(`${identitas.namaMapel || ''} | Semester: ${identitas.semester || ''} | Tahun: ${identitas.tahun || ''} | Kelas: ${kelas}`, 105, 28, { align: 'center' });
     const bodyData = siswa.filter(s=>s.kelas===kelas).map((s,i)=>{
         let jBenarValid = (s.jBenar !== undefined && !isNaN(s.jBenar) && s.jBenar <= jumSoal && jumSoal>0) ? s.jBenar : 0;
         let nilaiAsli = (jBenarValid > 0 && jumSoal>0) ? ((jBenarValid / jumSoal)*100).toFixed(2) : '0';
@@ -630,6 +627,12 @@ function simpanPDF() {
         return [i+1, s.nama, jBenarValid, nilaiAsli, nilaiJadi];
     });
     doc.autoTable({ head: [['No', 'Nama', 'Jml Benar', 'Nilai Asli', 'Nilai Jadi']], body: bodyData, startY: 35, styles: { fontSize: 9, halign: 'center' }, headStyles: { halign: 'center' } });
+    const today = new Date();
+    const tanggalStr = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+    doc.text(`Cetak: ${tanggalStr}`, 105, doc.lastAutoTable.finalY + 10, { align: 'center' });
+    doc.text(`Guru Mata Pelajaran`, 105, doc.lastAutoTable.finalY + 25, { align: 'center' });
+    doc.text(identitas.namaGuru || '(Nama Guru Mata Pelajaran)', 105, doc.lastAutoTable.finalY + 32, { align: 'center' });
+    doc.text('NIP.', 105, doc.lastAutoTable.finalY + 38, { align: 'center' });
     doc.save(`Nilai_${kelas}.pdf`);
 }
 function unduhExcelNilai() {
