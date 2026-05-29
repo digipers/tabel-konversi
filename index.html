@@ -128,13 +128,7 @@ th{ background:#f8fafc; font-weight:600; }
     color: #1e3a8a;
     transition: 0.2s;
 }
-.button-group-action button.btn-proses {
-    background: #1e88e5;
-    color: white;
-}
-.button-group-action button:hover {
-    opacity: 0.85;
-}
+.button-group-action button:hover { opacity: 0.85; }
 .caption-input {
     background: #e3f2fd;
     padding: 10px 12px;
@@ -160,7 +154,7 @@ th{ background:#f8fafc; font-weight:600; }
     width: 100%;
 }
 .dashboard-stats { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
-.stat-card { background: #fff; border: 1px solid #eef2ff; padding: 12px; border-radius: 20px; flex: 1; min-width: 100px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.stat-card { background: #fff; border: 1px solid #eef2ff; padding: 12px; border-radius: 20px; flex: 1; min-width: 100px; text-align: center; }
 .stat-card div:first-child { font-size: 13px; color: #475569; }
 .stat-number { font-weight: 800; font-size: 28px; }
 .print-area{display:none}
@@ -236,39 +230,38 @@ th{ background:#f8fafc; font-weight:600; }
     </div>
   </section>
 
-  <!-- INPUT NILAI (tombol Cetak/PDF/Excel dipindahkan ke BAWAH tabel) -->
+  <!-- INPUT NILAI -->
   <section id="inputnilai" class="page">
     <h2>🎯 Input & Konversi Nilai</h2>
     <div class="caption-input">
       🧭 <strong>Petunjuk:</strong> 
       <span style="background:#e8f0fe; padding:2px 6px; border-radius:12px;">🔵 Biru = Parameter</span> 
       <span style="background:#fff9c4; padding:2px 6px; border-radius:12px;">🟡 Kuning = Jawaban Benar</span>
+      <br>✅ Data nilai tersimpan otomatis (tidak hilang meskipun ganti kelas).
     </div>
     
     <label>📌 Pilih Kelas</label>
-    <select id="pilihKelas" onchange="renderInputNilai()">
+    <select id="pilihKelas" onchange="gantiKelas()">
       <option value="">-- Pilih Kelas --</option>
       <option value="X">X (SEPULUH)</option>
       <option value="XI">XI (SEBELAS)</option>
     </select>
 
-    <!-- Parameter Container (Jumlah Soal, Min, Max) + Tombol Proses di dalam sini -->
     <div class="param-container">
       <div class="param-group">
         <div class="param-item">
           <label>🔢 Jumlah Soal</label>
-          <input type="number" id="jumSoal" placeholder="contoh: 20" class="param-input" onchange="hitungDanUpdateNilaiAsli()">
+          <input type="number" id="jumSoal" placeholder="contoh: 20" class="param-input" onchange="simpanParameterKeLocal()">
         </div>
         <div class="param-item">
           <label>⬇️ Nilai Min Konversi</label>
-          <input type="number" id="minKonv" placeholder="75" class="param-input">
+          <input type="number" id="minKonv" placeholder="75" class="param-input" onchange="simpanParameterKeLocal()">
         </div>
         <div class="param-item">
           <label>⬆️ Nilai Max Konversi</label>
-          <input type="number" id="maxKonv" placeholder="95" class="param-input">
+          <input type="number" id="maxKonv" placeholder="95" class="param-input" onchange="simpanParameterKeLocal()">
         </div>
       </div>
-      <!-- Tombol Proses (Simpan & Proses) tetap di dekat parameter -->
       <div style="margin-top: 12px;">
         <button class="btn-primary" style="width:100%;" onclick="prosesKonversi()">💾 Simpan & Proses Konversi</button>
       </div>
@@ -278,17 +271,17 @@ th{ background:#f8fafc; font-weight:600; }
       📊 Rentang Nilai Asli: <strong><span id="autoMinAsli">N/A</span> - <span id="autoMaxAsli">N/A</span></strong>
     </div>
 
-    <!-- TABEL INPUT NILAI -->
+    <!-- TABEL INPUT NILAI (kolom nilai konversi diganti jadi Nilai Jadi) -->
     <div class="table-wrapper">
-      <table id="tblInputNilai" style="min-width:550px">
+      <table id="tblInputNilai" style="min-width:600px">
         <thead>
-          <tr><th>No</th><th>No Peserta</th><th>Nama</th><th>✅ J. Benar</th><th>📐 Nilai Asli</th><th>🎯 Konversi</th></tr>
+          <tr><th>No</th><th>No Peserta</th><th>Nama</th><th>✅ J. Benar</th><th>📐 Nilai Asli</th><th>🎯 Nilai Jadi</th></tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
 
-    <!-- Tombol Cetak, PDF, Excel dipindahkan ke BAWAH tabel (setelah input nilai) -->
+    <!-- Tombol Cetak, PDF, Excel -->
     <div class="button-group-action">
       <button onclick="cetakLembar()" style="background:#2563eb; color:white;">🖨️ Cetak Lembar</button>
       <button onclick="simpanPDF()" style="background:#16a34a; color:white;">📄 Simpan PDF</button>
@@ -296,13 +289,15 @@ th{ background:#f8fafc; font-weight:600; }
     </div>
   </section>
 
-  <!-- Print area -->
+  <!-- Print area (rincian lengkap) -->
   <div id="printArea" class="print-area">
     <div style="padding:15px">
       <h2 id="printSekolah"></h2>
       <div id="printMeta"></div>
       <table id="printTable" style="width:100%;border-collapse:collapse;margin-top:10px;">
-        <thead><tr><th>No</th><th>No Peserta</th><th>Nama</th><th>Nilai Asli</th><th>Nilai Konversi</th><th>Keterangan</th></tr></thead>
+        <thead>
+          <tr><th>No</th><th>No Peserta</th><th>Nama</th><th>Jumlah Benar</th><th>Nilai Asli</th><th>Nilai Jadi</th><th>Keterangan</th></tr>
+        </thead>
         <tbody></tbody>
       </table>
       <div class="ttd">
@@ -314,7 +309,7 @@ th{ background:#f8fafc; font-weight:600; }
 </main>
 
 <script>
-// ======================= DATA SISWA =======================
+// ======================= DATA SISWA (Master) =======================
 let siswa = [
     { noPeserta: '10-1001-0001-8', nama: 'Adi Saputra', kelas: 'X', jBenar: undefined, konversi: undefined },
     { noPeserta: '10-1001-0002-7', nama: 'Aulia Nur Laela', kelas: 'X', jBenar: undefined, konversi: undefined },
@@ -374,7 +369,49 @@ let siswa = [
 
 let identitas = {namaSekolah:'', namaKepalaSekolah:'', namaGuru:'', namaMapel:'', semester:'', tahun:''};
 
-// Sidebar
+// ======================= LOCALSTORAGE UNTUK MENYIMPAN NILAI PER SISWA =======================
+function simpanSemuaNilaiKeLocal() {
+    const dataToStore = siswa.map(s => ({ noPeserta: s.noPeserta, kelas: s.kelas, jBenar: s.jBenar, konversi: s.konversi }));
+    localStorage.setItem('siswaNilai', JSON.stringify(dataToStore));
+}
+function loadNilaiDariLocal() {
+    const stored = localStorage.getItem('siswaNilai');
+    if (stored) {
+        const nilaiArr = JSON.parse(stored);
+        nilaiArr.forEach(n => {
+            const idx = siswa.findIndex(s => s.noPeserta === n.noPeserta && s.kelas === n.kelas);
+            if (idx !== -1) {
+                siswa[idx].jBenar = n.jBenar;
+                siswa[idx].konversi = n.konversi;
+            }
+        });
+    }
+}
+function simpanParameterKeLocal() {
+    const kelas = document.getElementById('pilihKelas').value;
+    if (!kelas) return;
+    const jum = document.getElementById('jumSoal').value;
+    const min = document.getElementById('minKonv').value;
+    const max = document.getElementById('maxKonv').value;
+    const paramKey = `param_${kelas}`;
+    localStorage.setItem(paramKey, JSON.stringify({ jum, min, max }));
+}
+function loadParameterDariLocal(kelas) {
+    const paramKey = `param_${kelas}`;
+    const stored = localStorage.getItem(paramKey);
+    if (stored) {
+        const param = JSON.parse(stored);
+        document.getElementById('jumSoal').value = param.jum || '';
+        document.getElementById('minKonv').value = param.min || '';
+        document.getElementById('maxKonv').value = param.max || '';
+    } else {
+        document.getElementById('jumSoal').value = '';
+        document.getElementById('minKonv').value = '';
+        document.getElementById('maxKonv').value = '';
+    }
+}
+
+// ======================= SIDEBAR & UI =======================
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('overlay');
 const toggleBtn = document.getElementById('toggleBtn');
@@ -393,7 +430,20 @@ function simpanIdentitas(){
     identitas.namaMapel = document.getElementById('namaMapel').value; 
     identitas.semester = document.getElementById('semester').value; 
     identitas.tahun = document.getElementById('tahunPelajaran').value; 
+    localStorage.setItem('identitas', JSON.stringify(identitas));
     alert('Identitas tersimpan ✅'); 
+}
+function loadIdentitas() {
+    const stored = localStorage.getItem('identitas');
+    if (stored) {
+        identitas = JSON.parse(stored);
+        document.getElementById('namaSekolah').value = identitas.namaSekolah || '';
+        document.getElementById('namaKepalaSekolah').value = identitas.namaKepalaSekolah || '';
+        document.getElementById('namaGuru').value = identitas.namaGuru || '';
+        document.getElementById('namaMapel').value = identitas.namaMapel || '';
+        document.getElementById('semester').value = identitas.semester || 'Ganjil';
+        document.getElementById('tahunPelajaran').value = identitas.tahun || '';
+    }
 }
 function renderTable(){ 
     const body=document.querySelector('#tblSiswa tbody'); 
@@ -412,10 +462,11 @@ function tambahSiswaPrompt(){
     kelas=kelas.toUpperCase().trim(); 
     if(!['X','XI'].includes(kelas)){ alert('Hanya X/XI'); return; } 
     siswa.push({noPeserta:noPeserta.trim(), nama:nama.trim(), kelas, jBenar: undefined, konversi: undefined}); 
+    simpanSemuaNilaiKeLocal();
     renderTable(); 
 }
-function hapusSiswa(i){ if(!confirm('Hapus siswa?')) return; siswa.splice(i,1); renderTable(); }
-function kosongkanData(){ if(!confirm('Kosongkan semua siswa?')) return; siswa=[]; renderTable(); }
+function hapusSiswa(i){ if(!confirm('Hapus siswa?')) return; siswa.splice(i,1); simpanSemuaNilaiKeLocal(); renderTable(); }
+function kosongkanData(){ if(!confirm('Kosongkan semua siswa?')) return; siswa=[]; simpanSemuaNilaiKeLocal(); renderTable(); }
 
 function unduhTemplateXLSX(){ 
     const ws_data=[['No Peserta','Nama Siswa','Kelas']];
@@ -444,6 +495,7 @@ function unggahTemplateXLSX(evt){
             if (idx > -1) { siswa[idx].nama = nama; siswa[idx].kelas = kelas; updated++; } 
             else { siswa.push({noPeserta, nama, kelas, jBenar: undefined, konversi: undefined}); added++; }
         } 
+        simpanSemuaNilaiKeLocal();
         renderTable(); alert(`Upload selesai. +${added} baru, ${updated} update`);
     }; 
     reader.readAsArrayBuffer(file); 
@@ -481,15 +533,33 @@ function renderInputNilai(){
     const list=siswa.filter(s=>s.kelas===kelas);
     list.forEach((s,i)=>{ 
         const tr=document.createElement('tr'); 
-        tr.innerHTML=`<td>${i+1}</td><td>${escapeHtml(s.noPeserta)}</td><td>${escapeHtml(s.nama)}</td>
-                      <td><input type="number" class="input-nilai-jBenar" data-no="${escapeHtml(s.noPeserta)}" value="${s.jBenar!==undefined?escapeHtml(s.jBenar):''}" style="width:80px" oninput="hitungDanUpdateNilaiAsli()"></td>
-                      <td class="nilaiAsli"></td>
+        tr.innerHTML=`<td>${i+1}</td>
+                      <td>${escapeHtml(s.noPeserta)}</td>
+                      <td>${escapeHtml(s.nama)}</td>
+                      <td><input type="number" class="input-nilai-jBenar" data-no="${escapeHtml(s.noPeserta)}" value="${s.jBenar!==undefined?escapeHtml(s.jBenar):''}" style="width:80px" oninput="simpanSementaraDanUpdate(this)"></td>
+                      <td class="nilaiAsli">${(s.jBenar!==undefined && !isNaN(s.jBenar) && document.getElementById('jumSoal').value>0) ? ((s.jBenar / document.getElementById('jumSoal').value)*100).toFixed(2) : ''}</td>
                       <td class="nilaiKonversi">${s.konversi!==undefined?escapeHtml(s.konversi):''}</td>`; 
         tbody.appendChild(tr); 
     });
     hitungDanUpdateNilaiAsli();
 }
-
+function simpanSementaraDanUpdate(inputElem){
+    const row = inputElem.closest('tr');
+    const noPeserta = inputElem.getAttribute('data-no');
+    const kelas = document.getElementById('pilihKelas').value;
+    const jBenar = Number(inputElem.value);
+    const idx = siswa.findIndex(s => s.noPeserta === noPeserta && s.kelas === kelas);
+    if(idx !== -1){
+        siswa[idx].jBenar = isNaN(jBenar) ? undefined : jBenar;
+        simpanSemuaNilaiKeLocal();
+    }
+    hitungDanUpdateNilaiAsli();
+    const nilaiAsliCell = row.querySelector('.nilaiAsli');
+    const jumSoal = Number(document.getElementById('jumSoal').value);
+    if(!isNaN(jBenar) && jumSoal>0){
+        nilaiAsliCell.textContent = ((jBenar/jumSoal)*100).toFixed(2);
+    } else { nilaiAsliCell.textContent = ''; }
+}
 function prosesKonversi(){ 
     const minKonv=Number(document.getElementById('minKonv').value); 
     const maxKonv=Number(document.getElementById('maxKonv').value);
@@ -517,7 +587,15 @@ function prosesKonversi(){
         for(let i=0;i<siswa.length;i++) if(siswa[i].noPeserta===noPeserta && siswa[i].kelas===kelas){ siswa[i].jBenar = jBenar; siswa[i].konversi = konv; break; }
         row.querySelector('.nilaiKonversi').textContent = konv;
     }); 
-    renderTable(); alert('Konversi berhasil!');
+    simpanSemuaNilaiKeLocal();
+    simpanParameterKeLocal();
+    renderTable(); 
+    alert('Konversi berhasil & tersimpan!');
+}
+function gantiKelas() {
+    const kelas = document.getElementById('pilihKelas').value;
+    loadParameterDariLocal(kelas);
+    renderInputNilai();
 }
 function cetakLembar(){ 
     const kelas=document.getElementById('pilihKelas').value; if(!kelas){ alert('Pilih kelas'); return; } 
@@ -532,7 +610,15 @@ function cetakLembar(){
     const list=siswa.filter(s=>s.kelas===kelas); 
     list.forEach((s,i)=>{ 
         let nilaiAsli = (s.jBenar && !isNaN(s.jBenar)) ? ((s.jBenar / jumSoal) * 100).toFixed(2) : '';
-        tbody.innerHTML += `<tr><td>${i+1}</td><td>${escapeHtml(s.noPeserta)}</td><td>${escapeHtml(s.nama)}</td><td>${nilaiAsli}</td><td>${s.konversi||''}</td><td>${''}</td></tr>`;
+        tbody.innerHTML += `<tr>
+            <td>${i+1}</td>
+            <td>${escapeHtml(s.noPeserta)}</td>
+            <td>${escapeHtml(s.nama)}</td>
+            <td>${s.jBenar !== undefined ? s.jBenar : ''}</td>
+            <td>${nilaiAsli}</td>
+            <td>${s.konversi||''}</td>
+            <td></td>
+        </tr>`;
     });
     printArea.style.display='block'; window.print(); printArea.style.display='none'; 
 }
@@ -543,14 +629,26 @@ function simpanPDF() {
     doc.text(document.getElementById('namaSekolah').value || 'Sekolah', 105, 20, { align: 'center' });
     doc.setFontSize(10);
     doc.text(`${document.getElementById('namaMapel').value || ''} | Kelas: ${kelas}`, 105, 28, { align: 'center' });
-    const bodyData = siswa.filter(s=>s.kelas===kelas).map((s,i)=>[i+1, s.noPeserta, s.nama, (s.jBenar ? ((s.jBenar/jumSoal)*100).toFixed(2):''), s.konversi||'']);
-    doc.autoTable({ head: [['No','No Peserta','Nama','Nilai Asli','Konversi']], body: bodyData, startY: 35, styles: { fontSize: 9 } });
+    const bodyData = siswa.filter(s=>s.kelas===kelas).map((s,i)=>[
+        i+1, 
+        s.noPeserta, 
+        s.nama, 
+        s.jBenar !== undefined ? s.jBenar : '', 
+        (s.jBenar ? ((s.jBenar/jumSoal)*100).toFixed(2) : ''), 
+        s.konversi||''
+    ]);
+    doc.autoTable({ 
+        head: [['No','No Peserta','Nama','Jml Benar','Nilai Asli','Nilai Jadi']], 
+        body: bodyData, 
+        startY: 35, 
+        styles: { fontSize: 9 } 
+    });
     doc.save(`Nilai_${kelas}.pdf`);
 }
 function unduhExcelNilai() {
     const kelas = document.getElementById('pilihKelas').value; if(!kelas) return alert('Pilih kelas');
     const jumSoal = Number(document.getElementById('jumSoal').value); if(isNaN(jumSoal)||jumSoal<=0) return alert('Jumlah soal tidak valid');
-    const data = [['No','No Peserta','Nama','J.Benar','Nilai Asli','Konversi']];
+    const data = [['No','No Peserta','Nama','Jumlah Benar','Nilai Asli','Nilai Jadi']];
     siswa.filter(s=>s.kelas===kelas).forEach((s,i)=>{
         const asli = s.jBenar ? ((s.jBenar/jumSoal)*100).toFixed(2) : '';
         data.push([i+1, s.noPeserta, s.nama, s.jBenar||'', asli, s.konversi||'']);
@@ -558,7 +656,11 @@ function unduhExcelNilai() {
     const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Nilai'); XLSX.writeFile(wb, `Nilai_${kelas}.xlsx`);
 }
 
-renderTable(); updateCounts();
+// Inisialisasi
+loadNilaiDariLocal();
+loadIdentitas();
+renderTable(); 
+// Jangan panggil renderInputNilai langsung karena select kelas masih kosong
 </script>
 </body>
 </html>
