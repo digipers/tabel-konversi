@@ -15,9 +15,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 <style>
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 :root{--blue:#1e3a8a;--accent:#1e88e5}
 html,body{
     margin:0;
@@ -27,10 +25,7 @@ html,body{
     font-family: 'Segoe UI', Roboto, Arial, Helvetica, sans-serif;
     background:#f1f5f9;
 }
-body {
-    overflow-x: hidden;
-    position: relative;
-}
+body { overflow-x: hidden; position: relative; }
 .sidebar{
     position:fixed;
     left:0;
@@ -91,22 +86,10 @@ h1 {
     padding-top: 8px;
     word-break: break-word;
 }
-h2 {
-    font-size: 1.3rem;
-    margin-top: 0;
-}
-label{
-    display:block;
-    margin-top:8px;
-    font-weight:600;
-    font-size:0.85rem;
-}
-input,select,button{
-    font-size:14px;
-}
-input[type="text"],
-input[type="number"],
-select{
+h2 { font-size: 1.3rem; margin-top: 0; }
+label{ display:block; margin-top:8px; font-weight:600; font-size:0.85rem; }
+input,select,button{ font-size:14px; }
+input[type="text"], input[type="number"], select{
     padding:10px 10px;
     border:1px solid #cbd5e1;
     border-radius:12px;
@@ -115,81 +98,42 @@ select{
     box-sizing:border-box;
     background:#fff;
 }
-.small-btn{
-    padding:8px 12px;
-    font-size:13px;
-    border-radius:30px;
-    border:0;
-    cursor:pointer;
-    font-weight:500;
-}
-.btn-primary{
-    background:var(--accent);
-    color:#fff;
-    border:0;
-    padding:10px 16px;
-    border-radius:30px;
-    cursor:pointer;
-    font-weight:600;
-}
-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:12px;
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
-}
-th,td{
-    padding:10px 8px;
-    border:1px solid #e2e8f0;
-    text-align:left;
-    font-size:13px;
-}
-th{
-    background:#f8fafc;
-    font-weight:600;
-}
-/* RESPONSIVE: Buat tabel bisa di-scroll secara horizontal jika terlalu lebar, tapi halaman utama tidak ikut geser */
-.table-wrapper {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    margin-top: 12px;
-    border-radius: 12px;
-}
-.table-wrapper table {
-    display: table;
-    min-width: 600px;
-    white-space: nowrap;
-}
-/* Aturan untuk kartu parameter di HP */
-.param-container {
-    background: #f8fafc;
-    padding: 12px;
-    border-radius: 20px;
-    margin: 12px 0;
-}
-.param-group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-.param-item {
-    flex: 1;
-    min-width: 0;
-}
-.button-group {
+.small-btn{ padding:8px 12px; font-size:13px; border-radius:30px; border:0; cursor:pointer; font-weight:500; }
+.btn-primary{ background:var(--accent); color:#fff; border:0; padding:10px 16px; border-radius:30px; cursor:pointer; font-weight:600; }
+table{ width:100%; border-collapse:collapse; margin-top:12px; display: block; overflow-x: auto; white-space: nowrap; }
+th,td{ padding:10px 8px; border:1px solid #e2e8f0; text-align:left; font-size:13px; }
+th{ background:#f8fafc; font-weight:600; }
+.table-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-top: 12px; border-radius: 12px; }
+.table-wrapper table { display: table; min-width: 550px; white-space: nowrap; }
+.param-container { background: #f8fafc; padding: 12px; border-radius: 20px; margin: 12px 0; }
+.param-group { display: flex; flex-direction: column; gap: 12px; }
+.param-item { flex: 1; min-width: 0; }
+.button-group-action {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 12px;
+    margin-top: 16px;
+    margin-bottom: 8px;
     justify-content: flex-start;
 }
-.button-group button {
+.button-group-action button {
     flex: 1 0 auto;
-    padding: 8px 12px;
-    font-size: 13px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 40px;
+    border: none;
+    cursor: pointer;
+    background: #eef2ff;
+    color: #1e3a8a;
+    transition: 0.2s;
+}
+.button-group-action button.btn-proses {
+    background: #1e88e5;
+    color: white;
+}
+.button-group-action button:hover {
+    opacity: 0.85;
 }
 .caption-input {
     background: #e3f2fd;
@@ -199,7 +143,6 @@ th{
     margin-bottom: 16px;
     border-left: 4px solid #1e88e5;
 }
-/* Input khusus warna */
 .input-nilai-jBenar {
     background-color: #fff9c4 !important;
     border: 2px solid #f9a825 !important;
@@ -216,76 +159,25 @@ th{
     font-weight: 500;
     width: 100%;
 }
-.dashboard-stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 12px;
-}
-.stat-card {
-    background: #fff;
-    border: 1px solid #eef2ff;
-    padding: 12px;
-    border-radius: 20px;
-    flex: 1;
-    min-width: 100px;
-    text-align: center;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-}
-.stat-card div:first-child {
-    font-size: 13px;
-    color: #475569;
-}
-.stat-number {
-    font-weight: 800;
-    font-size: 28px;
-}
+.dashboard-stats { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+.stat-card { background: #fff; border: 1px solid #eef2ff; padding: 12px; border-radius: 20px; flex: 1; min-width: 100px; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+.stat-card div:first-child { font-size: 13px; color: #475569; }
+.stat-number { font-weight: 800; font-size: 28px; }
 .print-area{display:none}
 @media print {
     @page { size: A4 portrait; margin: 12mm; }
     body * { visibility: hidden; }
     .print-area, .print-area * { visibility: visible; }
-    .print-area {
-        position: fixed;
-        inset: 0;
-        padding: 8px;
-        box-sizing: border-box;
-    }
-    .print-area table {
-        white-space: normal;
-    }
+    .print-area { position: fixed; inset: 0; padding: 8px; box-sizing: border-box; }
+    .print-area table { white-space: normal; }
 }
-/* Perbaikan untuk tampilan hp: tidak ada margin kiri berlebih */
 @media (max-width: 640px) {
-    .main {
-        padding: 10px;
-    }
-    h1 {
-        font-size: 1.4rem;
-        margin-left: 40px;
-        word-break: break-word;
-    }
-    .toggleBtn {
-        left: 10px;
-        top: 10px;
-        padding: 8px 12px;
-    }
-    .page {
-        padding: 12px;
-    }
-    th, td {
-        padding: 6px 5px;
-        font-size: 12px;
-    }
-    .btn-primary, button {
-        font-size: 13px;
-    }
-    .param-input {
-        font-size: 14px;
-    }
-    .button-group button {
-        font-size: 12px;
-    }
+    .main { padding: 10px; }
+    h1 { font-size: 1.4rem; margin-left: 40px; }
+    .toggleBtn { left: 10px; top: 10px; padding: 8px 12px; }
+    .page { padding: 12px; }
+    th, td { padding: 6px 5px; font-size: 12px; }
+    .button-group-action button { font-size: 12px; padding: 8px 12px; }
 }
 </style>
 </head>
@@ -326,27 +218,25 @@ th{
     <div style="margin-top:16px"><button class="btn-primary" onclick="simpanIdentitas()">💾 Simpan Identitas</button></div>
   </section>
 
-  <!-- Data Siswa (Responsif dengan scroll horizontal di tabel) -->
+  <!-- Data Siswa -->
   <section id="datasiswa" class="page">
     <h2>📋 Data Siswa</h2>
     <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px">
       <button class="small-btn" onclick="unduhTemplateXLSX()" style="background:#1e88e5;color:#fff">⬇️ Unduh Template</button>
       <input id="fileUpload" type="file" accept=".xlsx,.xls" style="display:none" onchange="unggahTemplateXLSX(event)">
       <button class="small-btn" onclick="document.getElementById('fileUpload').click()" style="background:#fb8c00;color:#fff">⬆️ Unggah Excel</button>
-      <button class="small-btn" onclick="tambahSiswaPrompt()" style="background:#10b981;color:#white">➕ Tambah Siswa</button>
+      <button class="small-btn" onclick="tambahSiswaPrompt()" style="background:#10b981;color:white">➕ Tambah Siswa</button>
       <button class="small-btn" onclick="kosongkanData()" style="background:#ef4444;color:white">🗑️ Kosongkan</button>
     </div>
     <div class="table-wrapper">
       <table id="tblSiswa">
-        <thead>
-          <tr><th>No</th><th>No Peserta</th><th>Nama</th><th>Kelas</th><th>Aksi</th></tr>
-        </thead>
+        <thead><tr><th>No</th><th>No Peserta</th><th>Nama</th><th>Kelas</th><th>Aksi</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
   </section>
 
-  <!-- Input Nilai -->
+  <!-- INPUT NILAI (tombol Cetak/PDF/Excel dipindahkan ke BAWAH tabel) -->
   <section id="inputnilai" class="page">
     <h2>🎯 Input & Konversi Nilai</h2>
     <div class="caption-input">
@@ -362,6 +252,7 @@ th{
       <option value="XI">XI (SEBELAS)</option>
     </select>
 
+    <!-- Parameter Container (Jumlah Soal, Min, Max) + Tombol Proses di dalam sini -->
     <div class="param-container">
       <div class="param-group">
         <div class="param-item">
@@ -377,11 +268,9 @@ th{
           <input type="number" id="maxKonv" placeholder="95" class="param-input">
         </div>
       </div>
-      <div class="button-group">
-        <button class="btn-primary" onclick="prosesKonversi()">💾 Simpan & Proses</button>
-        <button onclick="cetakLembar()">🖨️ Cetak</button>
-        <button onclick="simpanPDF()">📄 PDF</button>
-        <button onclick="unduhExcelNilai()" style="background:#107c41; color:white;">📎 Excel</button>
+      <!-- Tombol Proses (Simpan & Proses) tetap di dekat parameter -->
+      <div style="margin-top: 12px;">
+        <button class="btn-primary" style="width:100%;" onclick="prosesKonversi()">💾 Simpan & Proses Konversi</button>
       </div>
     </div>
 
@@ -389,16 +278,21 @@ th{
       📊 Rentang Nilai Asli: <strong><span id="autoMinAsli">N/A</span> - <span id="autoMaxAsli">N/A</span></strong>
     </div>
 
-    <!-- Tabel input nilai dengan scroll horizontal jika diperlukan -->
+    <!-- TABEL INPUT NILAI -->
     <div class="table-wrapper">
       <table id="tblInputNilai" style="min-width:550px">
         <thead>
-          <tr>
-            <th>No</th><th>No Peserta</th><th>Nama</th><th>✅ J. Benar</th><th>📐 Nilai Asli</th><th>🎯 Konversi</th>
-          </tr>
+          <tr><th>No</th><th>No Peserta</th><th>Nama</th><th>✅ J. Benar</th><th>📐 Nilai Asli</th><th>🎯 Konversi</th></tr>
         </thead>
         <tbody></tbody>
       </table>
+    </div>
+
+    <!-- Tombol Cetak, PDF, Excel dipindahkan ke BAWAH tabel (setelah input nilai) -->
+    <div class="button-group-action">
+      <button onclick="cetakLembar()" style="background:#2563eb; color:white;">🖨️ Cetak Lembar</button>
+      <button onclick="simpanPDF()" style="background:#16a34a; color:white;">📄 Simpan PDF</button>
+      <button onclick="unduhExcelNilai()" style="background:#ea580c; color:white;">📎 Unduh Excel</button>
     </div>
   </section>
 
@@ -420,7 +314,7 @@ th{
 </main>
 
 <script>
-// ======================= DATA SISWA (full responsive) =======================
+// ======================= DATA SISWA =======================
 let siswa = [
     { noPeserta: '10-1001-0001-8', nama: 'Adi Saputra', kelas: 'X', jBenar: undefined, konversi: undefined },
     { noPeserta: '10-1001-0002-7', nama: 'Aulia Nur Laela', kelas: 'X', jBenar: undefined, konversi: undefined },
@@ -480,7 +374,7 @@ let siswa = [
 
 let identitas = {namaSekolah:'', namaKepalaSekolah:'', namaGuru:'', namaMapel:'', semester:'', tahun:''};
 
-// Sidebar Mobile friendly
+// Sidebar
 const sidebar = document.getElementById('sidebar');
 const overlay = document.getElementById('overlay');
 const toggleBtn = document.getElementById('toggleBtn');
@@ -638,15 +532,19 @@ function cetakLembar(){
     const list=siswa.filter(s=>s.kelas===kelas); 
     list.forEach((s,i)=>{ 
         let nilaiAsli = (s.jBenar && !isNaN(s.jBenar)) ? ((s.jBenar / jumSoal) * 100).toFixed(2) : '';
-        tbody.innerHTML += `<tr><td>${i+1}</td><td>${escapeHtml(s.noPeserta)}</td><td>${escapeHtml(s.nama)}</td><td>${nilaiAsli}</td><td>${s.konversi||''}</td><td></td></tr>`;
+        tbody.innerHTML += `<tr><td>${i+1}</td><td>${escapeHtml(s.noPeserta)}</td><td>${escapeHtml(s.nama)}</td><td>${nilaiAsli}</td><td>${s.konversi||''}</td><td>${''}</td></tr>`;
     });
     printArea.style.display='block'; window.print(); printArea.style.display='none'; 
 }
 function simpanPDF() {
     const { jsPDF } = window.jspdf; const kelas = document.getElementById('pilihKelas').value; if(!kelas) return alert('Pilih kelas'); 
     const jumSoal = Number(document.getElementById('jumSoal').value); if(isNaN(jumSoal)||jumSoal<=0) return alert('Jumlah soal tidak valid');
-    const doc = new jsPDF(); doc.text(document.getElementById('namaSekolah').value || 'Sekolah', 105, 20, { align: 'center' });
-    doc.autoTable({ head: [['No','No Peserta','Nama','Nilai Asli','Konversi']], body: siswa.filter(s=>s.kelas===kelas).map((s,i)=>[i+1, s.noPeserta, s.nama, (s.jBenar ? ((s.jBenar/jumSoal)*100).toFixed(2):''), s.konversi||'']), startY: 35 });
+    const doc = new jsPDF(); 
+    doc.text(document.getElementById('namaSekolah').value || 'Sekolah', 105, 20, { align: 'center' });
+    doc.setFontSize(10);
+    doc.text(`${document.getElementById('namaMapel').value || ''} | Kelas: ${kelas}`, 105, 28, { align: 'center' });
+    const bodyData = siswa.filter(s=>s.kelas===kelas).map((s,i)=>[i+1, s.noPeserta, s.nama, (s.jBenar ? ((s.jBenar/jumSoal)*100).toFixed(2):''), s.konversi||'']);
+    doc.autoTable({ head: [['No','No Peserta','Nama','Nilai Asli','Konversi']], body: bodyData, startY: 35, styles: { fontSize: 9 } });
     doc.save(`Nilai_${kelas}.pdf`);
 }
 function unduhExcelNilai() {
