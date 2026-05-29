@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<!-- PWA Meta Tags -->
+<meta name="theme-color" content="#1e3a8a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Konversi Nilai">
+<link rel="apple-touch-icon" href="icons/icon-192x192.png">
+<link rel="manifest" href="manifest.json">
+<title>Aplikasi Konversi Nilai — Sekolah</title>
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+<style>
+:root{--blue:#1e3a8a;--accent:#1e88e5}
+html,body{height:100%;margin:0;font-family:Arial,Helvetica,sans-serif}
+.sidebar{position:fixed;left:0;top:0;height:100%;width:240px;background:var(--blue);color:#fff;padding:18px;box-sizing:border-box;transform:translateX(-220px);transition:transform .25s ease;z-index:1200}
+.sidebar.open{transform:translateX(0)}
+.sidebar h2{margin:0 0 10px;font-size:18px;text-align:center}
+.sidebar ul{list-style:none;padding:0;margin:10px 0 0}
+.sidebar ul li{padding:10px 12px;border-radius:6px;cursor:pointer;margin-bottom:6px}
+.sidebar ul li:hover{background:rgba(255,255,255,0.12)}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.32);display:none;z-index:1100}
+.overlay.show{display:block}
+.main{margin-left:260px;padding:20px}
+.toggleBtn{position:fixed;left:8px;top:8px;z-index:1300;background:var(--blue);color:#fff;border:none;padding:8px 10px;border-radius:6px;cursor:pointer}
+.page{display:none;background:#fff;padding:16px;border-radius:8px;box-shadow:0 6px 18px rgba(15,23,42,0.06)}
+.page.show{display:block}
+label{display:block;margin-top:8px;font-weight:500;margin-bottom:4px}
+input,select,button{font-size:14px}
+input[type="text"],input[type="number"],select{padding:8px;border:1px solid #e6edf3;border-radius:6px;width:300px;box-sizing:border-box}
+.small-btn{padding:6px 10px;font-size:13px;border-radius:6px;border:0;cursor:pointer}
+.btn-primary{background:var(--accent);color:#fff;border:0;padding:8px 12px;border-radius:6px;cursor:pointer}
+table{width:100%;border-collapse:collapse;margin-top:12px}
+th,td{padding:8px;border:1px solid #e6eef6;text-align:left}
+th{background:#f3f6fb}
+
+/* PERBAIKAN WARNA INPUT DI HALAMAN INPUT NILAI */
+.input-nilai-jBenar {
+    background-color: #fff9c4 !important;  /* kuning lembut */
+    border: 2px solid #f9a825 !important;
+    border-radius: 6px;
+    padding: 8px;
+    width: 90px;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+.input-nilai-jBenar:focus {
+    background-color: #fff59d !important;
+    border-color: #f57f17 !important;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(245, 127, 23, 0.2);
+}
+
+/* WARNA UNTUK INPUT PARAMETER (Jumlah Soal, Min Konversi, Max Konversi) */
+.param-input {
+    background-color: #e8f0fe !important;  /* biru muda lembut */
+    border: 2px solid #1e88e5 !important;
+    border-radius: 6px;
+    padding: 8px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+.param-input:focus {
+    background-color: #d4e4fc !important;
+    border-color: #0d47a1 !important;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2);
+}
+
+/* Container parameter diberi latar belakang tipis */
+.param-container {
+    background: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-top: 8px;
+}
+
+td:has(.input-nilai-jBenar) {
+    background-color: #fffde7;
+}
+.caption-input {
+    background: #e3f2fd;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    border-left: 4px solid #1e88e5;
+}
+.print-area{display:none}
+@media print {
+    @page { size: A4 portrait; margin: 12mm; }
+    body * { visibility: hidden; }
+    .print-area, .print-area * { visibility: visible; }
+    .print-area {
+        position: fixed;
+        inset: 0;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+    .print-area h2 {
+        font-size: 16px;
+        text-align: center;
+        margin: 0 0 4px 0;
+    }
+    #printMeta {
+        text-align: center;
+        font-size: 11px;
+        margin-bottom: 8px;
+    }
+    .print-area table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 11px;
+        line-height: 1.3;
+    }
+    .print-area th, .print-area td {
+        border: 1px solid #000;
+        padding: 3px 4px;
+        vertical-align: top;
+    }
+    .print-area th {
+        background-color: #efefef !important;
+        font-weight: bold;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+    .ttd {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+        font-size: 11px;
+    }
+    .ttd div {
+        width: 45%;
+        text-align: center;
+    }
+}
+</style>
+</head>
+<body>
+<button id="toggleBtn" class="toggleBtn" title="Buka/Tutup menu">☰</button>
+<nav id="sidebar" class="sidebar" aria-hidden="true">
+  <h2>Aplikasi Nilai</h2>
+  <ul>
+    <li data-page="dashboard">📊 Dashboard</li>
+    <li data-page="identitas">🏫 Identitas Sekolah</li>
+    <li data-page="datasiswa">👥 Data Siswa</li>
+    <li data-page="inputnilai">✍️ Input Nilai</li>
+  </ul>
+</nav>
+<div id="overlay" class="overlay" aria-hidden="true"></div>
+<main class="main" id="main">
+  <h1>Aplikasi Konversi Nilai Siswa</h1>
+  
+  <!-- Dashboard -->
+  <section id="dashboard" class="page show">
+    <h2>Dashboard Rekap</h2>
+    <div style="display:flex;gap:12px;margin-top:12px">
+      <div style="background:#fff;border:1px solid #eef2ff;padding:12px;border-radius:8px;min-width:140px">
+        <div style="color:#6b7280">Kelas X</div>
+        <div id="countX" style="font-weight:700;font-size:20px">0</div>
+      </div>
+      <div style="background:#fff;border:1px solid #eef2ff;padding:12px;border-radius:8px;min-width:140px">
+        <div style="color:#6b7280">Kelas XI</div>
+        <div id="countXI" style="font-weight:700;font-size:20px">0</div>
+      </div>
+      <div style="background:#fff;border:1px solid #eef2ff;padding:12px;border-radius:8px;min-width:140px">
+        <div style="color:#6b7280">Kelas XII</div>
+        <div id="countXII" style="font-weight:700;font-size:20px">0</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Identitas -->
+  <section id="identitas" class="page">
+    <h2>Identitas Sekolah</h2>
+    <label>Nama Sekolah</label><input type="text" id="namaSekolah" placeholder="Contoh: SMK Negeri 1">
+    <label>Nama Kepala Sekolah</label><input type="text" id="namaKepalaSekolah" placeholder="Contoh: Bapak Drs. Ahmad Wijaya">
+    <label>Nama Guru Mata Pelajaran</label><input type="text" id="namaGuru" placeholder="Contoh: Bapak A">
+    <label>Nama Mata Pelajaran</label><input type="text" id="namaMapel" placeholder="Contoh: Matematika">
+    <label>Semester</label><select id="semester"><option>Ganjil</option><option>Genap</option></select>
+    <label>Tahun Pelajaran</label><input type="text" id="tahunPelajaran" placeholder="2024/2025">
+    <div style="margin-top:10px"><button class="btn-primary" onclick="simpanIdentitas()">Simpan Identitas</button></div>
+  </section>
+
+  <!-- Data Siswa -->
+  <section id="datasiswa" class="page">
+    <h2>Data Siswa</h2>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+      <button class="small-btn" onclick="unduhTemplateXLSX()" style="background:#1e88e5;color:#fff">⭳ Unduh Template</button>
+      <input id="fileUpload" type="file" accept=".xlsx,.xls" style="display:none" onchange="unggahTemplateXLSX(event)">
+      <button class="small-btn" onclick="document.getElementById('fileUpload').click()" style="background:#fb8c00;color:#fff">⭱ Unggah</button>
+      <div style="margin-left:8px;color:#6b7280">Template: No Peserta | Nama | Kelas</div>
+    </div>
+    <div style="margin-top:8px"><button class="btn-primary" onclick="tambahSiswaPrompt()">Tambah Siswa</button>
+    <button style="padding:8px 12px;margin-left:8px" onclick="kosongkanData()">Kosongkan Semua</button></div>
+
+    <table id="tblSiswa"><thead><tr><th style="width:40px">No</th><th>No Peserta</th><th>Nama</th><th>Kelas</th><th style="width:80px">Aksi</th></tr></thead><tbody></tbody></table>
+  </section>
+
+  <!-- INPUT NILAI -- dengan penekanan visual pada semua kolom input -->
+  <section id="inputnilai" class="page">
+    <h2>Input Nilai</h2>
+    
+    <!-- Petunjuk visual -->
+    <div class="caption-input">
+      ⚡ <strong>Petunjuk:</strong> 
+      <span style="background:#e8f0fe; padding:2px 6px; border-radius:4px; border:1px solid #1e88e5;">Biru</span> = Parameter wajib (Jumlah Soal, Min/Max Konversi) &nbsp;|&nbsp;
+      <span style="background:#fff9c4; padding:2px 6px; border-radius:4px; border:1px solid #f9a825;">Kuning</span> = Jumlah Jawaban Benar per siswa
+    </div>
+
+    <label>Pilih Kelas</label>
+    <select id="pilihKelas" onchange="renderInputNilai()"><option value="">-- Pilih Kelas --</option><option value="X">X (SEPULUH)</option><option value="XI">XI (SEBELAS)</option></select>
+
+    <!-- PARAMETER CONTAINER dengan warna pada input -->
+    <div class="param-container">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <div>
+          <label>📊 Jumlah Soal</label>
+          <input type="number" id="jumSoal" placeholder="contoh: 20" class="param-input" style="width:160px" onchange="hitungDanUpdateNilaiAsli()">
+        </div>
+        <div>
+          <label>⬇️ Nilai Minimal Konversi</label>
+          <input type="number" id="minKonv" placeholder="contoh: 75" class="param-input" style="width:160px">
+        </div>
+        <div>
+          <label>⬆️ Nilai Maksimal Konversi</label>
+          <input type="number" id="maxKonv" placeholder="contoh: 95" class="param-input" style="width:160px">
+        </div>
+        <div style="align-self:end">
+          <button class="btn-primary" onclick="prosesKonversi()">💾 Simpan & Proses</button>
+        </div>
+        <div style="align-self:end">
+          <button onclick="cetakLembar()">🖨️ Cetak</button>
+          <button onclick="simpanPDF()" style="margin-left:8px;">📄 PDF</button>
+          <button onclick="unduhExcelNilai()" style="margin-left:8px; background: #107c41; color: white;">📎 Excel</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px; font-size:13px; color:#555; background:#f1f8e9; padding:6px 12px; border-radius:8px;">
+      📈 Rentang Nilai Asli: <strong><span id="autoMinAsli">N/A</span> - <span id="autoMaxAsli">N/A</span></strong>
+    </div>
+
+    <table id="tblInputNilai" style="margin-top:12px">
+      <thead>
+        <tr>
+          <th style="width:40px">No</th>
+          <th>No Peserta</th>
+          <th>Nama</th>
+          <th style="width:140px">✅ J. Benar (wajib diisi)</th>
+          <th style="width:120px">📐 Nilai Asli</th>
+          <th style="width:120px">🎯 Nilai Konversi</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <!-- area untuk print -->
+  <div id="printArea" class="print-area">
+    <div style="padding:15px">
+      <h2 id="printSekolah"></h2>
+      <div id="printMeta"></div>
+      <table id="printTable" style="width:100%;border-collapse:collapse;margin-top:10px;">
+        <thead><tr><th>No</th><th>No Peserta</th><th>Nama</th><th>Nilai Asli</th><th>Nilai Konversi</th><th>Keterangan</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="ttd">
+        <div>Mengetahui,<br><br><strong>Kepala Sekolah</strong><br><br><br><br><u id="printNamaKepalaSekolah"></u><br>NIP.</div>
+        <div><strong>Guru Mata Pelajaran</strong><br><br><br><br><u id="printNamaGuru"></u><br>NIP.</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+// ======================= DATA SISWA (sesuai permintaan terbaru) =======================
+let siswa = [
+    { noPeserta: '10-1001-0001-8', nama: 'Adi Saputra', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0002-7', nama: 'Aulia Nur Laela', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0003-6', nama: 'Cipa Nadia Salma', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0004-5', nama: 'Dedi Irawan', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0005-4', nama: 'Farel Saputra', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0006-3', nama: 'Irfan', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0007-2', nama: 'Ismawati Dwi Anggraini', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0008-1', nama: 'Luthfi Hakim', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0010-9', nama: 'M.Riki Saputra', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0011-8', nama: 'M.Haris Setiawan', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0012-7', nama: 'M.Al Imron', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0013-6', nama: 'Nayla Himmatul Ulya', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0014-5', nama: 'Raditia Danu Pratama', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0015-4', nama: 'Ridho Firmansyah', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0016-3', nama: 'Rizal Abdul Haq', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0017-2', nama: 'Rizki Cahyo Sugeng Wibowo', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0018-1', nama: 'Safa Aulia Putri', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0019-9', nama: 'Shinta Sastya Wati', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '10-1001-0020-8', nama: 'Tiyas Farida Sari', kelas: 'X', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0001-8', nama: 'Ahmad Iqbal', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0002-7', nama: 'Ahmad Ramadhani', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0003-6', nama: 'Argi Setiyawan', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0004-5', nama: 'Aisyah Lu\'lu\'ul Husna', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0005-4', nama: 'Anggun Puspita Anggraini', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0006-3', nama: 'Dafa', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0007-2', nama: 'Devita Anjani', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0008-9', nama: 'Ferdi Kurniawan', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0009-8', nama: 'Fitra Afriza', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0010-7', nama: 'Indah Kasturi Kusuma Putri', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0011-6', nama: 'Lefiyana Juwita', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0012-5', nama: 'Marchfel Firdyansah', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0013-4', nama: 'Melinda Kusuma Dewi', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0014-3', nama: 'Muhamad yudha Rizky Iftori', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0015-2', nama: 'Mohamad Ibnu Rosid', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0016-9', nama: 'Muhammad Bisma Mega Nanda', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0017-8', nama: 'Muhammad Rizki Ramadhani', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0018-7', nama: 'Muhammad Fiki Darmawan', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0019-6', nama: 'M.Badru Muwafaq', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0020-5', nama: 'Rima', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0021-4', nama: 'Rima Ulvania', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0022-3', nama: 'Riski Munandar', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0023-2', nama: 'Siti Miftakhul Makmuroh', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0024-9', nama: 'Tomi Jatmiko', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0025-8', nama: 'Tia Dwi Saputri', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0026-7', nama: 'Wafiq Khariri', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0027-6', nama: 'Yeni Winarni', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0028-5', nama: 'Ainun Nadhiroh', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0029-4', nama: 'Dwi Fatimah', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0030-3', nama: 'M.Akbar Panjalu', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0031-2', nama: 'Habibatus zakia', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0032-9', nama: 'Angga Dwi Saputra', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0033-8', nama: 'M. Aufa Azmi', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0034-7', nama: 'Bayu', kelas: 'XI', jBenar: undefined, konversi: undefined },
+    { noPeserta: '11-1001-0035-6', nama: 'Ananda Ajeng P', kelas: 'XI', jBenar: undefined, konversi: undefined }
+];
+
+let identitas = {namaSekolah:'', namaKepalaSekolah:'', namaGuru:'', namaMapel:'', semester:'', tahun:''};
+
+// SIDEBAR
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+const toggleBtn = document.getElementById('toggleBtn');
+function openSidebar(){sidebar.classList.add('open');overlay.classList.add('show');sidebar.setAttribute('aria-hidden','false');overlay.setAttribute('aria-hidden','false')}
+function closeSidebar(){sidebar.classList.remove('open');overlay.classList.remove('show');sidebar.setAttribute('aria-hidden','true');overlay.setAttribute('aria-hidden','true')}
+toggleBtn.addEventListener('click', ()=>{if(sidebar.classList.contains('open')) closeSidebar(); else openSidebar();});
+overlay.addEventListener('click', ()=> closeSidebar());
+document.querySelectorAll('.sidebar ul li').forEach(li=>{ li.addEventListener('click', ()=>{ const page = li.dataset.page; document.querySelectorAll('.page').forEach(p=>p.classList.remove('show')); document.getElementById(page).classList.add('show'); closeSidebar(); }); });
+
+function updateCounts(){ document.getElementById('countX').textContent = siswa.filter(s=>s.kelas==='X').length; document.getElementById('countXI').textContent = siswa.filter(s=>s.kelas==='XI').length; document.getElementById('countXII').textContent = siswa.filter(s=>s.kelas==='XII').length; }
+function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function simpanIdentitas(){ 
+    identitas.namaSekolah = document.getElementById('namaSekolah').value; 
+    identitas.namaKepalaSekolah = document.getElementById('namaKepalaSekolah').value;
+    identitas.namaGuru = document.getElementById('namaGuru').value; 
+    identitas.namaMapel = document.getElementById('namaMapel').value; 
+    identitas.semester = document.getElementById('semester').value; 
+    identitas.tahun = document.getElementById('tahunPelajaran').value; 
+    alert('Identitas disimpan.'); 
+}
+
+function renderTable(){ 
+    const body=document.querySelector('#tblSiswa tbody'); 
+    body.innerHTML=''; 
+    siswa.forEach((s,i)=>{ 
+        const tr=document.createElement('tr'); 
+        tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(s.noPeserta)}</td><td>${escapeHtml(s.nama)}</td><td>${escapeHtml(s.kelas)}</td><td><button onclick="hapusSiswa(${i})" style="padding:6px 8px">Hapus</button></td>`; 
+        body.appendChild(tr); 
+    }); 
+    updateCounts(); 
+}
+function tambahSiswaPrompt(){ 
+    const noPeserta=prompt('No Peserta:'); if(!noPeserta) return;
+    const nama=prompt('Nama siswa:'); if(!nama) return; 
+    let kelas=prompt('Kelas (X/XI):'); if(!kelas) return; 
+    kelas=kelas.toUpperCase().trim(); 
+    if(!['X','XI'].includes(kelas)){ alert('Kelas hanya X/XI'); return; } 
+    siswa.push({noPeserta:noPeserta.trim(), nama:nama.trim(), kelas, jBenar: undefined, konversi: undefined}); 
+    renderTable(); 
+}
+function hapusSiswa(i){ if(!confirm('Hapus siswa?')) return; siswa.splice(i,1); renderTable(); }
+function kosongkanData(){ if(!confirm('Kosongkan semua data siswa?')) return; siswa=[]; renderTable(); }
+
+function unduhTemplateXLSX(){ 
+    const ws_data=[['No Peserta','Nama Siswa','Kelas']];
+    siswa.forEach(s => { ws_data.push([s.noPeserta, s.nama, s.kelas]); });
+    const ws=XLSX.utils.aoa_to_sheet(ws_data); 
+    ws['!cols'] = [{ wch: 20 }, { wch: 30 }, { wch: 10 }];
+    const wb=XLSX.utils.book_new(); 
+    XLSX.utils.book_append_sheet(wb,ws,'Data Siswa'); 
+    XLSX.writeFile(wb,`template_siswa.xlsx`); 
+}
+
+function unggahTemplateXLSX(evt){ 
+    const file=evt.target.files[0]; 
+    if(!file) return; 
+    const reader=new FileReader(); 
+    reader.onload=function(e){ 
+        const workbook=XLSX.read(new Uint8Array(e.target.result),{type:'array'}); 
+        const sheet=workbook.Sheets[workbook.SheetNames[0]]; 
+        const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:''}); 
+        let added=0, updated=0; 
+        for(let r=1;r<rows.length;r++){ 
+            const row=rows[r]; 
+            if(!row || row.length<2) continue; 
+            const noPeserta=(row[0]||'').toString().trim(); 
+            const nama=(row[1]||'').toString().trim(); 
+            let kelas=((row[2]||'')+'').toString().trim().toUpperCase(); 
+            if(!noPeserta || !nama || !['X','XI'].includes(kelas)) continue;
+            const existingIndex = siswa.findIndex(s => s.noPeserta === noPeserta);
+            if (existingIndex > -1) {
+                siswa[existingIndex].nama = nama;
+                siswa[existingIndex].kelas = kelas;
+                updated++;
+            } else {
+                siswa.push({noPeserta, nama, kelas, jBenar: undefined, konversi: undefined});
+                added++;
+            }
+        } 
+        renderTable(); 
+        alert(`Upload selesai. Ditambahkan: ${added}, Diperbarui: ${updated}`);
+    }; 
+    reader.readAsArrayBuffer(file); 
+}
+
+function hitungDanUpdateNilaiAsli() {
+    const kelas = document.getElementById('pilihKelas').value;
+    const jumSoal = Number(document.getElementById('jumSoal').value);
+    if (!kelas || isNaN(jumSoal) || jumSoal <= 0) {
+        document.getElementById('autoMinAsli').textContent = 'N/A';
+        document.getElementById('autoMaxAsli').textContent = 'N/A';
+        return;
+    }
+    const rows = document.querySelectorAll('#tblInputNilai tbody tr');
+    let nilaiAsliList = [];
+    rows.forEach(row => {
+        const jBenarInput = row.querySelector('.input-nilai-jBenar');
+        const nilaiAsliCell = row.querySelector('.nilaiAsli');
+        const jBenar = Number(jBenarInput.value);
+        if(!isNaN(jBenar)){
+            const nilaiAsli = (jBenar / jumSoal) * 100;
+            nilaiAsliCell.textContent = nilaiAsli.toFixed(2);
+            nilaiAsliList.push(nilaiAsli);
+        } else { nilaiAsliCell.textContent = ''; }
+    });
+    if (nilaiAsliList.length > 0) {
+        document.getElementById('autoMinAsli').textContent = Math.min(...nilaiAsliList).toFixed(2);
+        document.getElementById('autoMaxAsli').textContent = Math.max(...nilaiAsliList).toFixed(2);
+    } else {
+        document.getElementById('autoMinAsli').textContent = 'N/A';
+        document.getElementById('autoMaxAsli').textContent = 'N/A';
+    }
+}
+
+function renderInputNilai(){
+    const kelas=document.getElementById('pilihKelas').value;
+    const tbody=document.querySelector('#tblInputNilai tbody');
+    tbody.innerHTML='';
+    if(!kelas) return;
+    const list=siswa.filter(s=>s.kelas===kelas);
+    list.forEach((s,i)=>{ 
+        const tr=document.createElement('tr'); 
+        tr.innerHTML=`<td>${i+1}</td><td>${escapeHtml(s.noPeserta)}</td><td>${escapeHtml(s.nama)}</td>
+                       <td><input type="number" class="input-nilai-jBenar" data-no="${escapeHtml(s.noPeserta)}" value="${s.jBenar!==undefined?escapeHtml(s.jBenar):''}" style="width:90px" oninput="hitungDanUpdateNilaiAsli()"></td>
+                      <td class="nilaiAsli"></td>
+                      <td class="nilaiKonversi">${s.konversi!==undefined?escapeHtml(s.konversi):''}</td>`; 
+        tbody.appendChild(tr); 
+    });
+    hitungDanUpdateNilaiAsli();
+}
+
+function prosesKonversi(){ 
+    const minKonv=Number(document.getElementById('minKonv').value); 
+    const maxKonv=Number(document.getElementById('maxKonv').value);
+    const jumSoal = Number(document.getElementById('jumSoal').value);
+    if(isNaN(minKonv)||isNaN(maxKonv)||isNaN(jumSoal)||jumSoal <= 0){ alert('Isi semua field (Jumlah Soal, Min/Max Konversi) dengan angka yang valid.'); return; }
+    if(minKonv>=maxKonv){ alert('Nilai Min Konversi harus < Max Konversi'); return; }
+    const kelas=document.getElementById('pilihKelas').value; 
+    if(!kelas){ alert('Pilih kelas terlebih dahulu'); return; }
+    const rows=document.querySelectorAll('#tblInputNilai tbody tr'); 
+    let nilaiAsliList = [];
+    rows.forEach(row=>{ 
+        const jBenarInput=row.querySelector('.input-nilai-jBenar'); 
+        const jBenar = Number(jBenarInput.value);
+        if(!isNaN(jBenar)){ nilaiAsliList.push((jBenar / jumSoal) * 100); }
+    });
+    if(nilaiAsliList.length === 0){ alert('Tidak ada data J. Benar.'); return; }
+    const minAsli = Math.min(...nilaiAsliList);
+    const maxAsli = Math.max(...nilaiAsliList);
+    rows.forEach(row=>{ 
+        const jBenarInput=row.querySelector('.input-nilai-jBenar'); 
+        const noPeserta=jBenarInput.getAttribute('data-no'); 
+        const jBenar = Number(jBenarInput.value); 
+        let konv=''; 
+        if(!isNaN(jBenar)){
+            const nilaiAsli = (jBenar / jumSoal) * 100;
+            if(nilaiAsli <= minAsli) konv=minKonv;
+            else if(nilaiAsli >= maxAsli) konv=maxKonv;
+            else{ const ratio=(nilaiAsli - minAsli)/(maxAsli - minAsli); konv = Math.round(ratio * (maxKonv - minKonv) + minKonv); }
+        }
+        for(let i=0;i<siswa.length;i++){ 
+            if(siswa[i].noPeserta===noPeserta && siswa[i].kelas===kelas){ 
+                siswa[i].jBenar = jBenar; 
+                siswa[i].konversi = konv; 
+                break; 
+            } 
+        }
+        row.querySelector('.nilaiKonversi').textContent = konv;
+    }); 
+    renderTable(); 
+    alert('Proses konversi selesai.'); 
+}
+
+function cetakLembar(){ 
+    const kelas=document.getElementById('pilihKelas').value; 
+    if(!kelas){ alert('Pilih kelas untuk dicetak'); return; } 
+    const jumSoal = Number(document.getElementById('jumSoal').value);
+    if(isNaN(jumSoal) || jumSoal <= 0) { alert('Jumlah soal tidak valid.'); return; }
+    const minKonv=document.getElementById('minKonv').value; 
+    const maxKonv=document.getElementById('maxKonv').value; 
+    const minAsliText=document.getElementById('autoMinAsli').textContent;
+    const maxAsliText=document.getElementById('autoMaxAsli').textContent;
+    const printArea=document.getElementById('printArea'); 
+    document.getElementById('printSekolah').textContent = document.getElementById('namaSekolah').value || 'Nama Sekolah'; 
+    document.getElementById('printMeta').textContent = `${document.getElementById('namaMapel').value || ''} | Semester: ${document.getElementById('semester').value || ''} | Tahun: ${document.getElementById('tahunPelajaran').value || ''} | Kelas: ${kelas} | Rentang Asli: ${minAsliText}-${maxAsliText} | Rentang Konversi: ${minKonv}-${maxKonv}`;
+    document.getElementById('printNamaKepalaSekolah').textContent = identitas.namaKepalaSekolah || '(Nama Kepala Sekolah)';
+    document.getElementById('printNamaGuru').textContent = identitas.namaGuru || '(Nama Guru Mata Pelajaran)';
+    const tbody=document.querySelector('#printTable tbody'); 
+    tbody.innerHTML=''; 
+    const list=siswa.filter(s=>s.kelas===kelas); 
+    list.forEach((s,i)=>{ 
+        let nilaiAsli = (s.jBenar !== undefined && !isNaN(s.jBenar)) ? ((s.jBenar / jumSoal) * 100).toFixed(2) : '';
+        const tr=document.createElement('tr'); 
+        tr.innerHTML=`<td style="padding:6px;border:1px solid #333">${i+1}</td><td style="padding:6px;border:1px solid #333">${escapeHtml(s.noPeserta)}</td><td style="padding:6px;border:1px solid #333">${escapeHtml(s.nama)}</td><td style="padding:6px;border:1px solid #333">${nilaiAsli}</td><td style="padding:6px;border:1px solid #333">${s.konversi!==undefined?escapeHtml(s.konversi):''}</td><td style="padding:6px;border:1px solid #333"></td>`; 
+        tbody.appendChild(tr); 
+    });
+    printArea.style.display='block'; 
+    window.print(); 
+    printArea.style.display='none'; 
+}
+
+function simpanPDF() {
+    const { jsPDF } = window.jspdf;
+    const kelas = document.getElementById('pilihKelas').value;
+    if (!kelas) { alert('Pilih kelas terlebih dahulu.'); return; }
+    const jumSoal = Number(document.getElementById('jumSoal').value);
+    if(isNaN(jumSoal) || jumSoal <= 0) { alert('Jumlah soal tidak valid.'); return; }
+    const namaSekolah = document.getElementById('namaSekolah').value || 'Sekolah';
+    const namaMapel = document.getElementById('namaMapel').value || 'Mata Pelajaran';
+    const semester = document.getElementById('semester').value || '';
+    const tahun = document.getElementById('tahunPelajaran').value || '';
+    const minAsliText = document.getElementById('autoMinAsli').textContent;
+    const maxAsliText = document.getElementById('autoMaxAsli').textContent;
+    const minKonv = document.getElementById('minKonv').value;
+    const maxKonv = document.getElementById('maxKonv').value;
+    const namaKepalaSekolah = identitas.namaKepalaSekolah || 'Kepala Sekolah';
+    const namaGuruMapel = identitas.namaGuru || 'Guru Mata Pelajaran';
+    const list = siswa.filter(s => s.kelas === kelas);
+    const doc = new jsPDF();
+    doc.setFontSize(16);
+    doc.text(namaSekolah, 105, 20, { align: 'center' });
+    doc.setFontSize(10);
+    doc.text(`${namaMapel} | Semester: ${semester} | Tahun: ${tahun} | Kelas: ${kelas}`, 105, 30, { align: 'center' });
+    doc.text(`Rentang Asli: ${minAsliText}-${maxAsliText} | Rentang Konversi: ${minKonv}-${maxKonv}`, 105, 36, { align: 'center' });
+    const bodyData = list.map((s, i) => {
+        let nilaiAsli = (s.jBenar !== undefined && !isNaN(s.jBenar)) ? ((s.jBenar / jumSoal) * 100).toFixed(2) : '';
+        return [i+1, s.noPeserta, s.nama, nilaiAsli, s.konversi !== undefined ? s.konversi : ''];
+    });
+    doc.autoTable({
+        head: [['No', 'No Peserta', 'Nama', 'Nilai Asli', 'Nilai Konversi']],
+        body: bodyData,
+        startY: 45,
+        theme: 'grid',
+        styles: { fontSize: 9 },
+        headStyles: { fillColor: [102, 126, 234] }
+    });
+    const finalY = doc.lastAutoTable.finalY + 15;
+    doc.text('Mengetahui,', 55, finalY);
+    doc.setFont(undefined, 'bold');
+    doc.text('Kepala Sekolah', 55, finalY+12);
+    doc.setFont(undefined, 'normal');
+    doc.text(namaKepalaSekolah, 55, finalY+17);
+    doc.setFont(undefined, 'bold');
+    doc.text('Guru Mata Pelajaran', 155, finalY+12);
+    doc.setFont(undefined, 'normal');
+    doc.text(namaGuruMapel, 155, finalY+17);
+    doc.save(`Nilai_${kelas}.pdf`);
+}
+
+function unduhExcelNilai() {
+    const kelas = document.getElementById('pilihKelas').value;
+    if (!kelas) { alert('Pilih kelas terlebih dahulu.'); return; }
+    const jumSoal = Number(document.getElementById('jumSoal').value);
+    if(isNaN(jumSoal) || jumSoal <= 0) { alert('Jumlah soal tidak valid.'); return; }
+    const list = siswa.filter(s => s.kelas === kelas);
+    const ws_data = [['No', 'No Peserta', 'Nama', 'Jumlah Benar', 'Nilai Asli', 'Nilai Konversi']];
+    list.forEach((s, i) => {
+        const nilaiAsli = (s.jBenar !== undefined && !isNaN(s.jBenar)) ? ((s.jBenar / jumSoal) * 100).toFixed(2) : '';
+        ws_data.push([i+1, s.noPeserta, s.nama, s.jBenar || '', nilaiAsli, s.konversi || '']);
+    });
+    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+    ws['!cols'] = [{ wch: 5 }, { wch: 20 }, { wch: 30 }, { wch: 12 }, { wch: 12 }, { wch: 12 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Laporan Nilai');
+    XLSX.writeFile(wb, `Nilai_${kelas}.xlsx`);
+}
+
+renderTable(); updateCounts();
+</script>
+</body>
+</html>
