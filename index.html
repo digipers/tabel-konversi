@@ -145,6 +145,10 @@ th{ background:#f8fafc; font-weight:600; }
     width: 80px;
     font-weight: bold;
 }
+.input-nilai-jBenar.error {
+    border: 2px solid #ef4444 !important;
+    background-color: #fee2e2 !important;
+}
 .param-input {
     background-color: #e8f0fe !important;
     border: 2px solid #1e88e5 !important;
@@ -158,6 +162,36 @@ th{ background:#f8fafc; font-weight:600; }
 .stat-card div:first-child { font-size: 13px; color: #475569; }
 .stat-number { font-weight: 800; font-size: 28px; }
 .print-area{display:none}
+.backup-panel {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 16px;
+    padding: 12px;
+    margin-top: 16px;
+}
+.backup-panel h4 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #166534;
+}
+.backup-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.backup-buttons button {
+    background: #22c55e;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 13px;
+}
+.backup-buttons button.restore-btn {
+    background: #eab308;
+    color: #1e1b1b;
+}
 @media print {
     @page { size: A4 portrait; margin: 12mm; }
     body * { visibility: hidden; }
@@ -184,6 +218,7 @@ th{ background:#f8fafc; font-weight:600; }
     <li data-page="identitas">🏫 Identitas Sekolah</li>
     <li data-page="datasiswa">👥 Data Siswa</li>
     <li data-page="inputnilai">✍️ Input Nilai</li>
+    <li data-page="backup">💾 Backup & Restore</li>
   </ul>
 </nav>
 <div id="overlay" class="overlay" aria-hidden="true"></div>
@@ -224,7 +259,7 @@ th{ background:#f8fafc; font-weight:600; }
     </div>
     <div class="table-wrapper">
       <table id="tblSiswa">
-        <thead><tr><th>No</th><th>No Peserta</th><th>Nama</th><th>Kelas</th><th>Aksi</th></tr></thead>
+        <thead> <tr><th>No</th><th>No Peserta</th><th>Nama</th><th>Kelas</th><th>Aksi</th></tr> </thead>
         <tbody></tbody>
       </table>
     </div>
@@ -237,7 +272,7 @@ th{ background:#f8fafc; font-weight:600; }
       🧭 <strong>Petunjuk:</strong> 
       <span style="background:#e8f0fe; padding:2px 6px; border-radius:12px;">🔵 Biru = Parameter</span> 
       <span style="background:#fff9c4; padding:2px 6px; border-radius:12px;">🟡 Kuning = Jawaban Benar</span>
-      <br>✅ Data nilai tersimpan otomatis (tidak hilang meskipun ganti kelas).
+      <br>✅ Data tersimpan otomatis. Jika siswa tidak mengisi, nilai asli & nilai jadi = 0.
     </div>
     
     <label>📌 Pilih Kelas</label>
@@ -271,7 +306,6 @@ th{ background:#f8fafc; font-weight:600; }
       📊 Rentang Nilai Asli: <strong><span id="autoMinAsli">N/A</span> - <span id="autoMaxAsli">N/A</span></strong>
     </div>
 
-    <!-- TABEL INPUT NILAI (kolom nilai konversi diganti jadi Nilai Jadi) -->
     <div class="table-wrapper">
       <table id="tblInputNilai" style="min-width:600px">
         <thead>
@@ -281,7 +315,6 @@ th{ background:#f8fafc; font-weight:600; }
       </table>
     </div>
 
-    <!-- Tombol Cetak, PDF, Excel -->
     <div class="button-group-action">
       <button onclick="cetakLembar()" style="background:#2563eb; color:white;">🖨️ Cetak Lembar</button>
       <button onclick="simpanPDF()" style="background:#16a34a; color:white;">📄 Simpan PDF</button>
@@ -289,15 +322,27 @@ th{ background:#f8fafc; font-weight:600; }
     </div>
   </section>
 
-  <!-- Print area (rincian lengkap) -->
+  <!-- HALAMAN BACKUP & RESTORE -->
+  <section id="backup" class="page">
+    <h2>💾 Backup & Restore Data</h2>
+    <div class="backup-panel">
+      <h4>📦 Cadangkan Seluruh Data (Siswa + Nilai + Identitas + Parameter)</h4>
+      <div class="backup-buttons">
+        <button onclick="backupData()">⬇️ Backup ke File JSON</button>
+        <input type="file" id="restoreFileInput" accept=".json" style="display:none" onchange="restoreDataFromFile(this)">
+        <button class="restore-btn" onclick="document.getElementById('restoreFileInput').click()">↩️ Restore dari JSON</button>
+      </div>
+      <p style="font-size:12px; margin-top:8px; color:#4b5563">Backup mencakup: data siswa, nilai (jBenar & konversi), identitas sekolah, dan parameter per kelas.</p>
+    </div>
+  </section>
+
+  <!-- Print area -->
   <div id="printArea" class="print-area">
     <div style="padding:15px">
       <h2 id="printSekolah"></h2>
       <div id="printMeta"></div>
       <table id="printTable" style="width:100%;border-collapse:collapse;margin-top:10px;">
-        <thead>
-          <tr><th>No</th><th>No Peserta</th><th>Nama</th><th>Jumlah Benar</th><th>Nilai Asli</th><th>Nilai Jadi</th><th>Keterangan</th></tr>
-        </thead>
+        <thead><tr><th>No</th><th>No Peserta</th><th>Nama</th><th>Jumlah Benar</th><th>Nilai Asli</th><th>Nilai Jadi</th><th>Keterangan</th></tr></thead>
         <tbody></tbody>
       </table>
       <div class="ttd">
@@ -309,7 +354,7 @@ th{ background:#f8fafc; font-weight:600; }
 </main>
 
 <script>
-// ======================= DATA SISWA (Master) =======================
+// ======================= DATA SISWA =======================
 let siswa = [
     { noPeserta: '10-1001-0001-8', nama: 'Adi Saputra', kelas: 'X', jBenar: undefined, konversi: undefined },
     { noPeserta: '10-1001-0002-7', nama: 'Aulia Nur Laela', kelas: 'X', jBenar: undefined, konversi: undefined },
@@ -369,7 +414,7 @@ let siswa = [
 
 let identitas = {namaSekolah:'', namaKepalaSekolah:'', namaGuru:'', namaMapel:'', semester:'', tahun:''};
 
-// ======================= LOCALSTORAGE UNTUK MENYIMPAN NILAI PER SISWA =======================
+// ======================= LOCALSTORAGE =======================
 function simpanSemuaNilaiKeLocal() {
     const dataToStore = siswa.map(s => ({ noPeserta: s.noPeserta, kelas: s.kelas, jBenar: s.jBenar, konversi: s.konversi }));
     localStorage.setItem('siswaNilai', JSON.stringify(dataToStore));
@@ -380,10 +425,7 @@ function loadNilaiDariLocal() {
         const nilaiArr = JSON.parse(stored);
         nilaiArr.forEach(n => {
             const idx = siswa.findIndex(s => s.noPeserta === n.noPeserta && s.kelas === n.kelas);
-            if (idx !== -1) {
-                siswa[idx].jBenar = n.jBenar;
-                siswa[idx].konversi = n.konversi;
-            }
+            if (idx !== -1) { siswa[idx].jBenar = n.jBenar; siswa[idx].konversi = n.konversi; }
         });
     }
 }
@@ -393,28 +435,59 @@ function simpanParameterKeLocal() {
     const jum = document.getElementById('jumSoal').value;
     const min = document.getElementById('minKonv').value;
     const max = document.getElementById('maxKonv').value;
-    const paramKey = `param_${kelas}`;
-    localStorage.setItem(paramKey, JSON.stringify({ jum, min, max }));
+    localStorage.setItem(`param_${kelas}`, JSON.stringify({ jum, min, max }));
 }
 function loadParameterDariLocal(kelas) {
-    const paramKey = `param_${kelas}`;
-    const stored = localStorage.getItem(paramKey);
-    if (stored) {
-        const param = JSON.parse(stored);
-        document.getElementById('jumSoal').value = param.jum || '';
-        document.getElementById('minKonv').value = param.min || '';
-        document.getElementById('maxKonv').value = param.max || '';
-    } else {
-        document.getElementById('jumSoal').value = '';
-        document.getElementById('minKonv').value = '';
-        document.getElementById('maxKonv').value = '';
-    }
+    const stored = localStorage.getItem(`param_${kelas}`);
+    if (stored) { const p = JSON.parse(stored); document.getElementById('jumSoal').value = p.jum || ''; document.getElementById('minKonv').value = p.min || ''; document.getElementById('maxKonv').value = p.max || ''; }
+    else { document.getElementById('jumSoal').value = ''; document.getElementById('minKonv').value = ''; document.getElementById('maxKonv').value = ''; }
 }
 
-// ======================= SIDEBAR & UI =======================
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('overlay');
-const toggleBtn = document.getElementById('toggleBtn');
+// ======================= BACKUP & RESTORE =======================
+function backupData() {
+    const dataToBackup = {
+        siswa: siswa.map(s => ({ noPeserta: s.noPeserta, nama: s.nama, kelas: s.kelas, jBenar: s.jBenar, konversi: s.konversi })),
+        identitas: identitas,
+        params: {
+            param_X: localStorage.getItem('param_X') || null,
+            param_XI: localStorage.getItem('param_XI') || null
+        }
+    };
+    const blob = new Blob([JSON.stringify(dataToBackup, null, 2)], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `backup_nilai_${new Date().toISOString().slice(0,19)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    alert('Backup berhasil dibuat!');
+}
+function restoreDataFromFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const restored = JSON.parse(e.target.result);
+            if (restored.siswa && Array.isArray(restored.siswa)) {
+                siswa = restored.siswa.map(s => ({ ...s, jBenar: s.jBenar, konversi: s.konversi }));
+                simpanSemuaNilaiKeLocal();
+                renderTable();
+                if (restored.identitas) { identitas = restored.identitas; localStorage.setItem('identitas', JSON.stringify(identitas)); loadIdentitas(); }
+                if (restored.params) {
+                    if (restored.params.param_X) localStorage.setItem('param_X', restored.params.param_X);
+                    if (restored.params.param_XI) localStorage.setItem('param_XI', restored.params.param_XI);
+                }
+                alert('Restore berhasil! Silakan refresh halaman atau pilih kelas untuk melihat perubahan.');
+                location.reload();
+            } else throw new Error('Format tidak sesuai');
+        } catch(err) { alert('File JSON tidak valid: '+err.message); }
+    };
+    reader.readAsText(file);
+}
+
+// ======================= SIDEBAR =======================
+const sidebar = document.getElementById('sidebar'), overlay = document.getElementById('overlay'), toggleBtn = document.getElementById('toggleBtn');
 function openSidebar(){sidebar.classList.add('open');overlay.classList.add('show');}
 function closeSidebar(){sidebar.classList.remove('open');overlay.classList.remove('show');}
 toggleBtn.addEventListener('click', ()=>{if(sidebar.classList.contains('open')) closeSidebar(); else openSidebar();});
@@ -435,8 +508,7 @@ function simpanIdentitas(){
 }
 function loadIdentitas() {
     const stored = localStorage.getItem('identitas');
-    if (stored) {
-        identitas = JSON.parse(stored);
+    if (stored) { identitas = JSON.parse(stored);
         document.getElementById('namaSekolah').value = identitas.namaSekolah || '';
         document.getElementById('namaKepalaSekolah').value = identitas.namaKepalaSekolah || '';
         document.getElementById('namaGuru').value = identitas.namaGuru || '';
@@ -446,119 +518,124 @@ function loadIdentitas() {
     }
 }
 function renderTable(){ 
-    const body=document.querySelector('#tblSiswa tbody'); 
-    body.innerHTML=''; 
-    siswa.forEach((s,i)=>{ 
-        const tr=document.createElement('tr'); 
-        tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(s.noPeserta)}</td><td>${escapeHtml(s.nama)}</td><td>${escapeHtml(s.kelas)}</td><td><button onclick="hapusSiswa(${i})" style="padding:4px 8px;background:#fee2e2;border-radius:20px;border:0;">Hapus</button></td>`; 
-        body.appendChild(tr); 
-    }); 
-    updateCounts(); 
+    const body=document.querySelector('#tblSiswa tbody'); body.innerHTML=''; 
+    siswa.forEach((s,i)=>{ const tr=document.createElement('tr'); 
+        tr.innerHTML = `<td>${i+1}</td><td>${escapeHtml(s.noPeserta)}</td><td>${escapeHtml(s.nama)}</td><td>${escapeHtml(s.kelas)}</td><td><button onclick="hapusSiswa(${i})" style="padding:4px 8px;background:#fee2e2;border-radius:20px;">Hapus</button></td>`; 
+        body.appendChild(tr); }); updateCounts(); 
 }
 function tambahSiswaPrompt(){ 
     const noPeserta=prompt('No Peserta:'); if(!noPeserta) return;
     const nama=prompt('Nama:'); if(!nama) return; 
-    let kelas=prompt('Kelas (X/XI):'); if(!kelas) return; 
-    kelas=kelas.toUpperCase().trim(); 
+    let kelas=prompt('Kelas (X/XI):'); if(!kelas) return; kelas=kelas.toUpperCase().trim(); 
     if(!['X','XI'].includes(kelas)){ alert('Hanya X/XI'); return; } 
     siswa.push({noPeserta:noPeserta.trim(), nama:nama.trim(), kelas, jBenar: undefined, konversi: undefined}); 
-    simpanSemuaNilaiKeLocal();
-    renderTable(); 
+    simpanSemuaNilaiKeLocal(); renderTable(); 
 }
 function hapusSiswa(i){ if(!confirm('Hapus siswa?')) return; siswa.splice(i,1); simpanSemuaNilaiKeLocal(); renderTable(); }
 function kosongkanData(){ if(!confirm('Kosongkan semua siswa?')) return; siswa=[]; simpanSemuaNilaiKeLocal(); renderTable(); }
-
 function unduhTemplateXLSX(){ 
-    const ws_data=[['No Peserta','Nama Siswa','Kelas']];
-    siswa.forEach(s => { ws_data.push([s.noPeserta, s.nama, s.kelas]); });
-    const ws=XLSX.utils.aoa_to_sheet(ws_data); 
-    const wb=XLSX.utils.book_new(); 
-    XLSX.utils.book_append_sheet(wb,ws,'Data Siswa'); 
-    XLSX.writeFile(wb,`template_siswa.xlsx`); 
+    const ws_data=[['No Peserta','Nama Siswa','Kelas']]; siswa.forEach(s => ws_data.push([s.noPeserta, s.nama, s.kelas]));
+    const ws=XLSX.utils.aoa_to_sheet(ws_data); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Data Siswa'); XLSX.writeFile(wb,`template_siswa.xlsx`); 
 }
 function unggahTemplateXLSX(evt){ 
-    const file=evt.target.files[0]; 
-    if(!file) return; 
-    const reader=new FileReader(); 
-    reader.onload=function(e){ 
+    const file=evt.target.files[0]; if(!file) return; 
+    const reader=new FileReader(); reader.onload=function(e){ 
         const workbook=XLSX.read(new Uint8Array(e.target.result),{type:'array'}); 
         const sheet=workbook.Sheets[workbook.SheetNames[0]]; 
-        const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:''}); 
-        let added=0, updated=0; 
-        for(let r=1;r<rows.length;r++){ 
-            const row=rows[r]; if(!row || row.length<2) continue; 
-            const noPeserta=(row[0]||'').toString().trim(); 
-            const nama=(row[1]||'').toString().trim(); 
-            let kelas=((row[2]||'')+'').toString().trim().toUpperCase(); 
-            if(!noPeserta || !nama || !['X','XI'].includes(kelas)) continue;
+        const rows=XLSX.utils.sheet_to_json(sheet,{header:1,defval:''}); let added=0, updated=0; 
+        for(let r=1;r<rows.length;r++){ const row=rows[r]; if(!row||row.length<2) continue; 
+            const noPeserta=(row[0]||'').toString().trim(); const nama=(row[1]||'').toString().trim(); 
+            let kelas=((row[2]||'')+'').toString().trim().toUpperCase(); if(!noPeserta||!nama||!['X','XI'].includes(kelas)) continue;
             const idx = siswa.findIndex(s => s.noPeserta === noPeserta);
             if (idx > -1) { siswa[idx].nama = nama; siswa[idx].kelas = kelas; updated++; } 
             else { siswa.push({noPeserta, nama, kelas, jBenar: undefined, konversi: undefined}); added++; }
-        } 
-        simpanSemuaNilaiKeLocal();
-        renderTable(); alert(`Upload selesai. +${added} baru, ${updated} update`);
-    }; 
-    reader.readAsArrayBuffer(file); 
+        } simpanSemuaNilaiKeLocal(); renderTable(); alert(`Upload selesai. +${added} baru, ${updated} update`);
+    }; reader.readAsArrayBuffer(file); 
 }
 
-function hitungDanUpdateNilaiAsli() {
+// Validasi & update nilai dengan aturan: jika kosong -> 0, jika > jumlah soal -> peringatan
+function validasiDanUpdateJBenar(inputElem) {
+    const jumSoal = Number(document.getElementById('jumSoal').value);
+    let nilai = inputElem.value === '' ? undefined : Number(inputElem.value);
+    if (nilai !== undefined && !isNaN(nilai)) {
+        if (nilai > jumSoal && jumSoal > 0) {
+            alert(`⚠️ Jawaban benar tidak boleh melebihi jumlah soal (${jumSoal})! Nilai akan diset 0.`);
+            nilai = undefined;
+            inputElem.value = '';
+            inputElem.classList.add('error');
+            setTimeout(() => inputElem.classList.remove('error'), 1500);
+        } else {
+            inputElem.classList.remove('error');
+        }
+    } else {
+        inputElem.classList.remove('error');
+    }
+    const noPeserta = inputElem.getAttribute('data-no');
+    const kelas = document.getElementById('pilihKelas').value;
+    const idx = siswa.findIndex(s => s.noPeserta === noPeserta && s.kelas === kelas);
+    if (idx !== -1) {
+        siswa[idx].jBenar = (nilai !== undefined && !isNaN(nilai)) ? nilai : undefined;
+        simpanSemuaNilaiKeLocal();
+    }
+    hitungDanUpdateTampilanNilai();
+    return true;
+}
+function hitungDanUpdateTampilanNilai() {
     const kelas = document.getElementById('pilihKelas').value;
     const jumSoal = Number(document.getElementById('jumSoal').value);
-    if (!kelas || isNaN(jumSoal) || jumSoal <= 0) {
-        document.getElementById('autoMinAsli').textContent = 'N/A'; document.getElementById('autoMaxAsli').textContent = 'N/A'; return;
-    }
     const rows = document.querySelectorAll('#tblInputNilai tbody tr');
-    let nilaiList = [];
+    let nilaiAsliList = [];
     rows.forEach(row => {
         const jBenarInput = row.querySelector('.input-nilai-jBenar');
         const nilaiAsliCell = row.querySelector('.nilaiAsli');
-        const jBenar = Number(jBenarInput.value);
-        if(!isNaN(jBenar)){
-            const nilaiAsli = (jBenar / jumSoal) * 100;
-            nilaiAsliCell.textContent = nilaiAsli.toFixed(2);
-            nilaiList.push(nilaiAsli);
-        } else { nilaiAsliCell.textContent = ''; }
+        const nilaiKonversiCell = row.querySelector('.nilaiKonversi');
+        let jBenar = jBenarInput.value === '' ? undefined : Number(jBenarInput.value);
+        let nilaiAsli = 0, nilaiJadi = 0;
+        if (jBenar !== undefined && !isNaN(jBenar) && jumSoal > 0 && jBenar <= jumSoal) {
+            nilaiAsli = (jBenar / jumSoal) * 100;
+            nilaiAsliList.push(nilaiAsli);
+        } else {
+            nilaiAsli = 0;
+        }
+        nilaiAsliCell.textContent = (jBenar !== undefined && !isNaN(jBenar) && jumSoal > 0 && jBenar <= jumSoal) ? nilaiAsli.toFixed(2) : '0';
+        const minKonv = Number(document.getElementById('minKonv').value);
+        const maxKonv = Number(document.getElementById('maxKonv').value);
+        if (!isNaN(minKonv) && !isNaN(maxKonv) && minKonv < maxKonv && nilaiAsliList.length > 0 && jBenar !== undefined && !isNaN(jBenar) && jumSoal > 0 && jBenar <= jumSoal) {
+            const minAsliGlobal = Math.min(...nilaiAsliList);
+            const maxAsliGlobal = Math.max(...nilaiAsliList);
+            if (nilaiAsli <= minAsliGlobal) nilaiJadi = minKonv;
+            else if (nilaiAsli >= maxAsliGlobal) nilaiJadi = maxKonv;
+            else nilaiJadi = Math.round(((nilaiAsli - minAsliGlobal)/(maxAsliGlobal - minAsliGlobal)) * (maxKonv - minKonv) + minKonv);
+            nilaiKonversiCell.textContent = nilaiJadi;
+            const noPeserta = jBenarInput.getAttribute('data-no');
+            const idx = siswa.findIndex(s => s.noPeserta === noPeserta && s.kelas === kelas);
+            if (idx !== -1) siswa[idx].konversi = nilaiJadi;
+        } else {
+            nilaiKonversiCell.textContent = '0';
+            const noPeserta = jBenarInput.getAttribute('data-no');
+            const idx = siswa.findIndex(s => s.noPeserta === noPeserta && s.kelas === kelas);
+            if (idx !== -1 && (jBenar === undefined || isNaN(jBenar) || jumSoal <= 0 || jBenar > jumSoal)) siswa[idx].konversi = 0;
+        }
     });
-    if (nilaiList.length) {
-        document.getElementById('autoMinAsli').textContent = Math.min(...nilaiList).toFixed(2);
-        document.getElementById('autoMaxAsli').textContent = Math.max(...nilaiList).toFixed(2);
+    if (nilaiAsliList.length > 0 && jumSoal > 0) {
+        document.getElementById('autoMinAsli').textContent = Math.min(...nilaiAsliList).toFixed(2);
+        document.getElementById('autoMaxAsli').textContent = Math.max(...nilaiAsliList).toFixed(2);
     } else { document.getElementById('autoMinAsli').textContent = 'N/A'; document.getElementById('autoMaxAsli').textContent = 'N/A'; }
+    simpanSemuaNilaiKeLocal();
 }
-
 function renderInputNilai(){
     const kelas=document.getElementById('pilihKelas').value;
-    const tbody=document.querySelector('#tblInputNilai tbody');
-    tbody.innerHTML='';
+    const tbody=document.querySelector('#tblInputNilai tbody'); tbody.innerHTML='';
     if(!kelas) return;
     const list=siswa.filter(s=>s.kelas===kelas);
     list.forEach((s,i)=>{ 
         const tr=document.createElement('tr'); 
-        tr.innerHTML=`<td>${i+1}</td>
-                      <td>${escapeHtml(s.noPeserta)}</td>
-                      <td>${escapeHtml(s.nama)}</td>
-                      <td><input type="number" class="input-nilai-jBenar" data-no="${escapeHtml(s.noPeserta)}" value="${s.jBenar!==undefined?escapeHtml(s.jBenar):''}" style="width:80px" oninput="simpanSementaraDanUpdate(this)"></td>
-                      <td class="nilaiAsli">${(s.jBenar!==undefined && !isNaN(s.jBenar) && document.getElementById('jumSoal').value>0) ? ((s.jBenar / document.getElementById('jumSoal').value)*100).toFixed(2) : ''}</td>
-                      <td class="nilaiKonversi">${s.konversi!==undefined?escapeHtml(s.konversi):''}</td>`; 
+        tr.innerHTML=`<td>${i+1}</td><td>${escapeHtml(s.noPeserta)}</td><td>${escapeHtml(s.nama)}</td>
+                      <td><input type="number" class="input-nilai-jBenar" data-no="${escapeHtml(s.noPeserta)}" value="${s.jBenar!==undefined && s.jBenar!==null ? escapeHtml(s.jBenar) : ''}" style="width:80px" oninput="validasiDanUpdateJBenar(this)"></td>
+                      <td class="nilaiAsli">0</td><td class="nilaiKonversi">0</td>`; 
         tbody.appendChild(tr); 
     });
-    hitungDanUpdateNilaiAsli();
-}
-function simpanSementaraDanUpdate(inputElem){
-    const row = inputElem.closest('tr');
-    const noPeserta = inputElem.getAttribute('data-no');
-    const kelas = document.getElementById('pilihKelas').value;
-    const jBenar = Number(inputElem.value);
-    const idx = siswa.findIndex(s => s.noPeserta === noPeserta && s.kelas === kelas);
-    if(idx !== -1){
-        siswa[idx].jBenar = isNaN(jBenar) ? undefined : jBenar;
-        simpanSemuaNilaiKeLocal();
-    }
-    hitungDanUpdateNilaiAsli();
-    const nilaiAsliCell = row.querySelector('.nilaiAsli');
-    const jumSoal = Number(document.getElementById('jumSoal').value);
-    if(!isNaN(jBenar) && jumSoal>0){
-        nilaiAsliCell.textContent = ((jBenar/jumSoal)*100).toFixed(2);
-    } else { nilaiAsliCell.textContent = ''; }
+    hitungDanUpdateTampilanNilai();
 }
 function prosesKonversi(){ 
     const minKonv=Number(document.getElementById('minKonv').value); 
@@ -566,37 +643,13 @@ function prosesKonversi(){
     const jumSoal = Number(document.getElementById('jumSoal').value);
     if(isNaN(minKonv)||isNaN(maxKonv)||isNaN(jumSoal)||jumSoal <= 0){ alert('Isi Jumlah Soal, Min/Max Konversi'); return; }
     if(minKonv>=maxKonv){ alert('Min harus < Max'); return; }
-    const kelas=document.getElementById('pilihKelas').value; 
-    if(!kelas){ alert('Pilih kelas'); return; }
-    const rows=document.querySelectorAll('#tblInputNilai tbody tr'); 
-    let nilaiAsliList = [];
-    rows.forEach(row=>{ const jBenar = Number(row.querySelector('.input-nilai-jBenar').value); if(!isNaN(jBenar)) nilaiAsliList.push((jBenar / jumSoal) * 100); });
-    if(nilaiAsliList.length === 0){ alert('Isi minimal satu J. Benar'); return; }
-    const minAsli = Math.min(...nilaiAsliList), maxAsli = Math.max(...nilaiAsliList);
-    rows.forEach(row=>{ 
-        const inp = row.querySelector('.input-nilai-jBenar'); 
-        const noPeserta = inp.getAttribute('data-no'); 
-        const jBenar = Number(inp.value); 
-        let konv=''; 
-        if(!isNaN(jBenar)){
-            const nilaiAsli = (jBenar / jumSoal) * 100;
-            if(nilaiAsli <= minAsli) konv=minKonv;
-            else if(nilaiAsli >= maxAsli) konv=maxKonv;
-            else konv = Math.round(((nilaiAsli - minAsli)/(maxAsli - minAsli)) * (maxKonv - minKonv) + minKonv);
-        }
-        for(let i=0;i<siswa.length;i++) if(siswa[i].noPeserta===noPeserta && siswa[i].kelas===kelas){ siswa[i].jBenar = jBenar; siswa[i].konversi = konv; break; }
-        row.querySelector('.nilaiKonversi').textContent = konv;
-    }); 
-    simpanSemuaNilaiKeLocal();
+    const kelas=document.getElementById('pilihKelas').value; if(!kelas){ alert('Pilih kelas'); return; }
+    hitungDanUpdateTampilanNilai();
     simpanParameterKeLocal();
     renderTable(); 
-    alert('Konversi berhasil & tersimpan!');
+    alert('Konversi selesai & tersimpan!');
 }
-function gantiKelas() {
-    const kelas = document.getElementById('pilihKelas').value;
-    loadParameterDariLocal(kelas);
-    renderInputNilai();
-}
+function gantiKelas() { const kelas = document.getElementById('pilihKelas').value; loadParameterDariLocal(kelas); renderInputNilai(); }
 function cetakLembar(){ 
     const kelas=document.getElementById('pilihKelas').value; if(!kelas){ alert('Pilih kelas'); return; } 
     const jumSoal = Number(document.getElementById('jumSoal').value);
@@ -609,16 +662,10 @@ function cetakLembar(){
     const tbody=document.querySelector('#printTable tbody'); tbody.innerHTML=''; 
     const list=siswa.filter(s=>s.kelas===kelas); 
     list.forEach((s,i)=>{ 
-        let nilaiAsli = (s.jBenar && !isNaN(s.jBenar)) ? ((s.jBenar / jumSoal) * 100).toFixed(2) : '';
-        tbody.innerHTML += `<tr>
-            <td>${i+1}</td>
-            <td>${escapeHtml(s.noPeserta)}</td>
-            <td>${escapeHtml(s.nama)}</td>
-            <td>${s.jBenar !== undefined ? s.jBenar : ''}</td>
-            <td>${nilaiAsli}</td>
-            <td>${s.konversi||''}</td>
-            <td></td>
-        </tr>`;
+        let jBenarValid = (s.jBenar !== undefined && !isNaN(s.jBenar) && s.jBenar <= jumSoal && jumSoal>0) ? s.jBenar : 0;
+        let nilaiAsli = (jBenarValid > 0 && jumSoal>0) ? ((jBenarValid / jumSoal) * 100).toFixed(2) : '0';
+        let nilaiJadi = (s.konversi !== undefined && s.konversi !== null && !isNaN(s.konversi)) ? s.konversi : '0';
+        tbody.innerHTML += `<tr><td>${i+1}</td><td>${escapeHtml(s.noPeserta)}</td><td>${escapeHtml(s.nama)}</td><td>${jBenarValid}</td><td>${nilaiAsli}</td><td>${nilaiJadi}</td><td></td></tr>`;
     });
     printArea.style.display='block'; window.print(); printArea.style.display='none'; 
 }
@@ -629,20 +676,13 @@ function simpanPDF() {
     doc.text(document.getElementById('namaSekolah').value || 'Sekolah', 105, 20, { align: 'center' });
     doc.setFontSize(10);
     doc.text(`${document.getElementById('namaMapel').value || ''} | Kelas: ${kelas}`, 105, 28, { align: 'center' });
-    const bodyData = siswa.filter(s=>s.kelas===kelas).map((s,i)=>[
-        i+1, 
-        s.noPeserta, 
-        s.nama, 
-        s.jBenar !== undefined ? s.jBenar : '', 
-        (s.jBenar ? ((s.jBenar/jumSoal)*100).toFixed(2) : ''), 
-        s.konversi||''
-    ]);
-    doc.autoTable({ 
-        head: [['No','No Peserta','Nama','Jml Benar','Nilai Asli','Nilai Jadi']], 
-        body: bodyData, 
-        startY: 35, 
-        styles: { fontSize: 9 } 
+    const bodyData = siswa.filter(s=>s.kelas===kelas).map((s,i)=>{
+        let jBenarValid = (s.jBenar !== undefined && !isNaN(s.jBenar) && s.jBenar <= jumSoal && jumSoal>0) ? s.jBenar : 0;
+        let nilaiAsli = (jBenarValid > 0 && jumSoal>0) ? ((jBenarValid / jumSoal)*100).toFixed(2) : '0';
+        let nilaiJadi = (s.konversi !== undefined && s.konversi !== null && !isNaN(s.konversi)) ? s.konversi : '0';
+        return [i+1, s.noPeserta, s.nama, jBenarValid, nilaiAsli, nilaiJadi];
     });
+    doc.autoTable({ head: [['No','No Peserta','Nama','Jml Benar','Nilai Asli','Nilai Jadi']], body: bodyData, startY: 35, styles: { fontSize: 9 } });
     doc.save(`Nilai_${kelas}.pdf`);
 }
 function unduhExcelNilai() {
@@ -650,17 +690,15 @@ function unduhExcelNilai() {
     const jumSoal = Number(document.getElementById('jumSoal').value); if(isNaN(jumSoal)||jumSoal<=0) return alert('Jumlah soal tidak valid');
     const data = [['No','No Peserta','Nama','Jumlah Benar','Nilai Asli','Nilai Jadi']];
     siswa.filter(s=>s.kelas===kelas).forEach((s,i)=>{
-        const asli = s.jBenar ? ((s.jBenar/jumSoal)*100).toFixed(2) : '';
-        data.push([i+1, s.noPeserta, s.nama, s.jBenar||'', asli, s.konversi||'']);
+        let jBenarValid = (s.jBenar !== undefined && !isNaN(s.jBenar) && s.jBenar <= jumSoal && jumSoal>0) ? s.jBenar : 0;
+        let nilaiAsli = (jBenarValid > 0 && jumSoal>0) ? ((jBenarValid / jumSoal)*100).toFixed(2) : '0';
+        let nilaiJadi = (s.konversi !== undefined && s.konversi !== null && !isNaN(s.konversi)) ? s.konversi : '0';
+        data.push([i+1, s.noPeserta, s.nama, jBenarValid, nilaiAsli, nilaiJadi]);
     });
     const ws = XLSX.utils.aoa_to_sheet(data); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Nilai'); XLSX.writeFile(wb, `Nilai_${kelas}.xlsx`);
 }
 
-// Inisialisasi
-loadNilaiDariLocal();
-loadIdentitas();
-renderTable(); 
-// Jangan panggil renderInputNilai langsung karena select kelas masih kosong
+loadNilaiDariLocal(); loadIdentitas(); renderTable();
 </script>
 </body>
 </html>
